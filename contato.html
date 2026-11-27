@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <title>Eventos — Ingressos & Bilheteria</title>
+  <link rel="stylesheet" href="assets/css/tailwind.css" />
+  <script src="assets/js/state.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/format.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/ev.js"></script>
+  <script src="assets/js/query.js"></script>
+  <script src="assets/js/icons.js"></script>
+  <script src="assets/js/i18n.js"></script>
+</head>
+<body data-shell="public">
+  <div id="app"><div id="page"></div></div>
+
+  <script>
+    window.onFormSubmit = function (name, form) {
+      if (name !== 'contact') return;
+      const t = UI.t;
+      const data = Object.fromEntries(new FormData(form).entries());
+      if (!data.name || !data.email || !/.+@.+\..+/.test(data.email) || !data.message) {
+        UI.notify(t('contact.validation.required'), 'error');
+        return;
+      }
+      UI.notify(t('contact.success'), 'success');
+      form.reset();
+    };
+
+    window.renderPage = function () {
+      const t = UI.t, icon = UI.icon;
+
+      const field = (n, label, type) =>
+        '<label class="block"><span class="text-sm font-medium text-body">' + label + '</span><input required type="' + (type || 'text') + '" name="' + n + '" class="mt-1.5 h-11 w-full rounded-lg border border-themed bg-transparent px-3 text-sm text-body outline-none focus:border-brand-300 focus-ring"/></label>';
+
+      const formCard =
+        '<form data-page-form="contact" class="surface-card rounded-2xl border p-6"><div class="grid gap-4 sm:grid-cols-2">' +
+        field('name', t('contact.name')) +
+        field('email', t('contact.email'), 'email') +
+        '</div>' +
+        '<div class="mt-4">' + field('subject', t('contact.subject')) + '</div>' +
+        '<label class="mt-4 block"><span class="text-sm font-medium text-body">' + t('contact.message') + '</span><textarea required name="message" rows="5" class="mt-1.5 w-full rounded-lg border border-themed bg-transparent px-3 py-2 text-sm text-body outline-none focus:border-brand-300 focus-ring"></textarea></label>' +
+        '<button type="submit" class="mt-5 flex h-12 items-center justify-center gap-2 rounded-xl bg-brand-500 px-6 text-sm font-semibold text-white transition hover:bg-brand-600">' + icon('mail', { size: 18 }) + t('contact.send') + '</button>' +
+        '</form>';
+
+      const infoRow = (ic, label, value) =>
+        '<div class="flex items-start gap-3"><span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-500 dark:bg-brand-500/15">' + icon(ic, { size: 18 }) + '</span><div><p class="text-xs text-muted">' + label + '</p><p class="text-sm font-medium text-heading">' + value + '</p></div></div>';
+      const infoCard =
+        '<aside><div class="surface-card rounded-2xl border p-6"><h2 class="text-lg font-semibold text-heading">' + t('contact.infoTitle') + '</h2><div class="mt-5 space-y-5">' +
+        infoRow('mail', t('contact.email'), 'contato@eventix.com') +
+        infoRow('phone', t('contact.phone'), '+55 11 4000-1234') +
+        infoRow('map-pin', t('contact.address'), 'Av. Paulista, 1000 — São Paulo') +
+        '</div></div></aside>';
+
+      document.getElementById('page').innerHTML =
+        '<div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">' +
+        '<div class="mx-auto max-w-2xl text-center"><h1 class="text-3xl font-bold text-heading">' + t('contact.title') + '</h1><p class="mt-3 text-muted">' + t('contact.subtitle') + '</p></div>' +
+        '<div class="mt-10 grid gap-8 lg:grid-cols-[1fr_340px]">' + formCard + infoCard + '</div>' +
+        '</div>';
+    };
+  </script>
+  <script src="assets/js/layout.js"></script>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <title>Eventos — Ingressos & Bilheteria</title>
+  <link rel="stylesheet" href="assets/css/tailwind.css" />
+  <script src="assets/js/state.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/format.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/ev.js"></script>
+  <script src="assets/js/query.js"></script>
+  <script src="assets/js/icons.js"></script>
+  <script src="assets/js/i18n.js"></script>
+</head>
+<body data-shell="app" data-guard="true">
+  <div id="app"><div id="page"></div></div>
+
+  <script>
+    const FEE_RATE = Data.FEE_RATE;
+
+    window.renderPage = function () {
+      const t = UI.t, icon = UI.icon;
+      const st = EventsStore.get();
+      const paid = st.orders.filter((o) => o.status === 'paid');
+      const pending = st.orders.filter((o) => o.status === 'pending');
+      const gross = paid.reduce((s, o) => s + o.subtotal, 0);
+      const fees = paid.reduce((s, o) => s + o.fee, 0);
+      const net = gross - fees;
+      const pendingTotal = pending.reduce((s, o) => s + o.total, 0);
+
+      const kpis =
+        UI.kpiCard({ title: t('finance.kpis.gross'), value: UI.fmt(gross), icon: 'dollar', accent: 'brand' }) +
+        UI.kpiCard({ title: t('finance.kpis.fees'), value: UI.fmt(fees), icon: 'percent', accent: 'warning' }) +
+        UI.kpiCard({ title: t('finance.kpis.net'), value: UI.fmt(net), icon: 'trending-up', accent: 'success' }) +
+        UI.kpiCard({ title: t('finance.kpis.pending'), value: UI.fmt(pendingTotal), icon: 'clock', accent: 'info' });
+
+      // Aggregate revenue per event from paid order lines.
+      const byEvent = {};
+      paid.forEach((o) => o.lines.forEach((l) => {
+        const e = byEvent[l.eventId] || { eventId: l.eventId, title: l.eventTitle, sold: 0, gross: 0 };
+        e.sold += l.qty;
+        e.gross += l.unitPrice * l.qty;
+        byEvent[l.eventId] = e;
+      }));
+      const rows = Object.values(byEvent).sort((a, b) => b.gross - a.gross);
+
+      const tableRows = rows.length
+        ? rows.map((r) => {
+            const fee = Math.round(r.gross * FEE_RATE * 100) / 100;
+            return '<tr class="border-b border-themed last:border-0"><td class="px-5 py-3.5 text-sm font-medium text-heading">' + r.title + '</td><td class="px-5 py-3.5 text-sm text-body">' + r.sold + '</td><td class="px-5 py-3.5 text-sm text-body">' + UI.fmt(r.gross) + '</td><td class="px-5 py-3.5 text-sm text-warning-600">-' + UI.fmt(fee) + '</td><td class="px-5 py-3.5 text-sm font-semibold text-heading">' + UI.fmt(r.gross - fee) + '</td></tr>';
+          }).join('')
+        : '<tr><td colspan="5" class="px-5 py-12 text-center text-sm text-muted">' + t('common.noResults') + '</td></tr>';
+
+      document.getElementById('page').innerHTML =
+        UI.pageHeader({ title: t('finance.title'), subtitle: t('finance.subtitle') }) +
+        '<div class="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">' + kpis + '</div>' +
+        '<div class="mt-6"><h3 class="mb-3 text-base font-semibold text-heading">' + t('finance.byEventTitle') + '</h3>' +
+        '<div class="surface-card overflow-hidden rounded-2xl border"><div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="border-b border-themed bg-gray-50/50 text-left text-muted dark:bg-gray-900/30"><th class="px-5 py-3.5 font-medium">' + t('finance.columns.event') + '</th><th class="px-5 py-3.5 font-medium">' + t('finance.columns.sold') + '</th><th class="px-5 py-3.5 font-medium">' + t('finance.columns.gross') + '</th><th class="px-5 py-3.5 font-medium">' + t('finance.columns.fee') + '</th><th class="px-5 py-3.5 font-medium">' + t('finance.columns.net') + '</th></tr></thead><tbody>' + tableRows + '</tbody></table></div></div>' +
+        '<p class="mt-3 flex items-center gap-2 text-xs text-muted">' + icon('info', { size: 14 }) + t('finance.payoutNote') + '</p></div>';
+    };
+  </script>
+  <script src="assets/js/layout.js"></script>
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <title>Eventos — Ingressos & Bilheteria</title>
+  <link rel="stylesheet" href="assets/css/tailwind.css" />
+  <script src="assets/js/state.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/format.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/ev.js"></script>
+  <script src="assets/js/query.js"></script>
+  <script src="assets/js/icons.js"></script>
+  <script src="assets/js/i18n.js"></script>
+</head>
+<body data-shell="app" data-guard="true">
+  <div id="app"><div id="page"></div></div>
+
+  <script>
+    const eventId = Number(new URLSearchParams(window.location.search).get('id'));
+    let activeTab = 0;
+    let editingTier = null;
+
+    window.onTabChange = function (i) {
+      activeTab = i;
+      window.renderPage();
+    };
+
+    window.openTierModal = function (id) {
+      editingTier = id || null;
+      const t = UI.t;
+      const st = EventsStore.get();
+      const tier = id ? st.tiers.find((x) => x.id === id) : null;
+      const f = (n, label, val, type) =>
+        '<label class="block"><span class="text-sm font-medium text-body">' + label + '</span><input type="' + (type || 'text') + '" name="' + n + '" value="' + (val == null ? '' : val) + '" class="mt-1.5 h-11 w-full rounded-lg border border-themed bg-transparent px-3 text-sm text-body outline-none focus:border-brand-300 focus-ring"/></label>';
+      const body =
+        '<form data-page-form="tier" class="grid gap-4">' +
+        f('name', t('sales.tierName'), tier && tier.name) +
+        '<div class="grid grid-cols-2 gap-4">' + f('price', t('sales.tierPrice'), tier && tier.price, 'number') + f('total', t('sales.tierTotal'), tier && tier.total, 'number') + '</div>' +
+        '<label class="flex items-center gap-2 text-sm text-body"><input type="checkbox" name="active" ' + (!tier || tier.active ? 'checked' : '') + ' class="rounded border-themed"/> ' + t('sales.tierActive') + '</label>' +
+        '</form>';
+      const footer =
+        '<button type="button" data-modal-close class="h-10 rounded-lg border border-themed px-4 text-sm font-medium text-body hover:bg-gray-50 dark:hover:bg-gray-800">' + t('common.cancel') + '</button>' +
+        '<button type="button" onclick="saveTier()" class="h-10 rounded-lg bg-brand-500 px-4 text-sm font-medium text-white hover:bg-brand-600">' + t('common.save') + '</button>';
+      document.getElementById('modal-mount').innerHTML = UI.modal('tier-modal', { title: tier ? t('sales.editTier') : t('sales.addTier'), body: body, footer: footer });
+      UI.openModal('tier-modal');
+    };
+
+    window.saveTier = function () {
+      const t = UI.t;
+      const form = document.querySelector('#tier-modal [data-page-form="tier"]');
+      const data = Object.fromEntries(new FormData(form).entries());
+      const patch = { name: data.name, price: Number(data.price) || 0, total: Number(data.total) || 0, active: data.active === 'on' };
+      if (editingTier) EventsStore.updateTier(editingTier, patch);
+      else EventsStore.addTier(eventId, patch);
+      UI.notify(t('sales.tierSaved'), 'success');
+      UI.closeModal('tier-modal');
+      window.renderPage();
+    };
+
+    window.renderPage = function () {
+      const t = UI.t, icon = UI.icon;
+      const st = EventsStore.get();
+      const event = Query.eventById(st.events, eventId);
+      if (!event) {
+        document.getElementById('page').innerHTML = UI.emptyState({ icon: 'calendar', title: t('event.notFound'), action: '<a href="app-eventos.html" class="inline-flex rounded-lg bg-brand-500 px-6 py-3 text-sm font-medium text-white hover:bg-brand-600">' + t('event.backToEvents') + '</a>' });
+        return;
+      }
+      const tiers = Query.tiersForEvent(st.tiers, eventId);
+      const orders = Query.ordersForEvent(st.orders, eventId);
+      const sold = tiers.reduce((s, x) => s + x.sold, 0);
+      const remaining = tiers.reduce((s, x) => s + Query.tierRemaining(x), 0);
+      const revenue = tiers.reduce((s, x) => s + x.sold * x.price, 0);
+
+      const kpis =
+        UI.kpiCard({ title: t('sales.kpis.sold'), value: sold, icon: 'ticket', accent: 'brand' }) +
+        UI.kpiCard({ title: t('sales.kpis.revenue'), value: UI.fmt(revenue), icon: 'dollar', accent: 'success' }) +
+        UI.kpiCard({ title: t('sales.kpis.remaining'), value: remaining, icon: 'shopping-cart', accent: 'info' });
+
+      const tierRows = tiers.map((x) =>
+        '<tr class="border-b border-themed last:border-0">' +
+        '<td class="px-5 py-3.5 text-sm font-medium text-heading">' + x.name + '</td>' +
+        '<td class="px-5 py-3.5 text-sm text-body">' + UI.fmt(x.price) + '</td>' +
+        '<td class="px-5 py-3.5 text-sm text-body">' + x.sold + '</td>' +
+        '<td class="px-5 py-3.5 text-sm text-body">' + x.total + '</td>' +
+        '<td class="px-5 py-3.5">' + UI.badge(x.active ? t('sales.active') : t('sales.closed'), x.active ? 'success' : 'gray') + '</td>' +
+        '<td class="px-5 py-3.5 text-right"><button type="button" onclick="openTierModal(\'' + x.id + '\')" class="flex h-8 w-8 items-center justify-center rounded-lg border border-themed text-muted hover:text-heading">' + icon('edit', { size: 14 }) + '</button></td>' +
+        '</tr>'
+      ).join('');
+      const tiersPanel =
+        '<div class="mb-4 flex justify-end"><button type="button" onclick="openTierModal()" class="flex h-10 items-center gap-2 rounded-lg bg-brand-500 px-4 text-sm font-medium text-white hover:bg-brand-600">' + icon('plus', { size: 16 }) + t('sales.addTier') + '</button></div>' +
+        '<div class="surface-card overflow-hidden rounded-2xl border"><div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="border-b border-themed bg-gray-50/50 text-left text-muted dark:bg-gray-900/30"><th class="px-5 py-3.5 font-medium">' + t('sales.tierColumns.tier') + '</th><th class="px-5 py-3.5 font-medium">' + t('sales.tierColumns.price') + '</th><th class="px-5 py-3.5 font-medium">' + t('sales.tierColumns.sold') + '</th><th class="px-5 py-3.5 font-medium">' + t('sales.tierColumns.total') + '</th><th class="px-5 py-3.5 font-medium">' + t('sales.tierColumns.status') + '</th><th class="px-5 py-3.5 text-right font-medium">' + t('sales.tierColumns.actions') + '</th></tr></thead><tbody>' + tierRows + '</tbody></table></div></div>';
+
+      const ordersPanel = orders.length
+        ? '<div class="surface-card overflow-hidden rounded-2xl border"><div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="border-b border-themed bg-gray-50/50 text-left text-muted dark:bg-gray-900/30"><th class="px-5 py-3.5 font-medium">' + t('sales.orderColumns.code') + '</th><th class="px-5 py-3.5 font-medium">' + t('sales.orderColumns.buyer') + '</th><th class="px-5 py-3.5 font-medium">' + t('sales.orderColumns.qty') + '</th><th class="px-5 py-3.5 font-medium">' + t('sales.orderColumns.total') + '</th><th class="px-5 py-3.5 font-medium">' + t('sales.orderColumns.status') + '</th><th class="px-5 py-3.5 font-medium">' + t('sales.orderColumns.date') + '</th></tr></thead><tbody>' +
+            orders.map((o) => '<tr class="border-b border-themed last:border-0"><td class="px-5 py-3.5 font-mono text-xs text-body">' + o.code + '</td><td class="px-5 py-3.5 text-sm text-heading">' + o.buyerName + '</td><td class="px-5 py-3.5 text-sm text-body">' + o.lines.reduce((s, l) => s + l.qty, 0) + '</td><td class="px-5 py-3.5 text-sm font-medium text-heading">' + UI.fmt(o.total) + '</td><td class="px-5 py-3.5">' + UI.statusPill('order', o.status) + '</td><td class="px-5 py-3.5 text-sm text-muted">' + UI.fmtDate(o.createdAt) + '</td></tr>').join('') +
+            '</tbody></table></div></div>'
+        : UI.emptyState({ icon: 'shopping-cart', title: t('sales.noOrders') });
+
+      const tabsHtml = UI.tabs([
+        { label: t('sales.tabs.tiers'), icon: 'ticket', content: tiersPanel },
+        { label: t('sales.tabs.orders'), icon: 'shopping-cart', content: ordersPanel },
+      ], activeTab);
+
+      document.getElementById('page').innerHTML =
+        UI.pageHeader({ title: event.title, subtitle: t('sales.title'), crumbs: [{ label: t('manage.title'), href: 'app-eventos.html' }, { label: event.title }] }) +
+        '<div class="grid grid-cols-1 gap-5 sm:grid-cols-3">' + kpis + '</div>' +
+        '<div class="mt-6 surface-card rounded-2xl border p-5">' + tabsHtml + '</div>' +
+        '<div id="modal-mount"></div>';
+    };
+  </script>
+  <script src="assets/js/layout.js"></script>
+</body>
+</html>

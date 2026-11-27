@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <title>Eventos — Ingressos & Bilheteria</title>
+  <link rel="stylesheet" href="assets/css/tailwind.css" />
+  <script src="assets/js/state.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/format.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/ev.js"></script>
+  <script src="assets/js/query.js"></script>
+  <script src="assets/js/icons.js"></script>
+  <script src="assets/js/i18n.js"></script>
+</head>
+<body data-shell="app" data-guard="true">
+  <div id="app"><div id="page"></div></div>
+
+  <script>
+    let activeTab = 0;
+    const notifPrefs = { sales: true, checkin: true, weekly: false, marketing: false };
+
+    window.onTabChange = function (i) { activeTab = i; window.renderPage(); };
+
+    window.onFormSubmit = function (name, form) {
+      const t = UI.t;
+      if (name === 'profile') {
+        const d = Object.fromEntries(new FormData(form).entries());
+        Auth.updateProfile({ name: d.name, email: d.email, role: d.role });
+      }
+      UI.notify(t('settings.saved'), 'success');
+    };
+
+    window.toggleNotif = function (key, btn) {
+      notifPrefs[key] = !notifPrefs[key];
+      btn.setAttribute('aria-checked', String(notifPrefs[key]));
+      btn.className = 'relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition ' + (notifPrefs[key] ? 'bg-brand-500' : 'bg-gray-300 dark:bg-gray-700');
+      btn.querySelector('span').className = 'inline-block h-4 w-4 transform rounded-full bg-white shadow-theme-xs transition ' + (notifPrefs[key] ? 'translate-x-6' : 'translate-x-1');
+    };
+
+    window.renderPage = function () {
+      const t = UI.t;
+      const user = Auth.getUser() || {};
+      const fld = (n, label, val, type) =>
+        '<label class="block"><span class="text-sm font-medium text-body">' + label + '</span><input type="' + (type || 'text') + '" name="' + n + '" value="' + (val || '') + '" class="mt-1.5 h-11 w-full rounded-lg border border-themed bg-transparent px-3 text-sm text-body outline-none focus:border-brand-300 focus-ring"/></label>';
+
+      const profilePanel =
+        '<form data-page-form="profile" class="max-w-lg space-y-4">' +
+        fld('name', t('settings.profile.name'), user.name) +
+        fld('email', t('settings.profile.email'), user.email, 'email') +
+        fld('role', t('settings.profile.role'), user.role) +
+        '<button type="submit" class="h-11 rounded-lg bg-brand-500 px-5 text-sm font-medium text-white hover:bg-brand-600">' + t('settings.profile.save') + '</button>' +
+        '</form>';
+
+      const orgPanel =
+        '<form data-page-form="organization" class="max-w-lg space-y-4">' +
+        fld('orgName', t('settings.organization.name'), user.organization) +
+        fld('document', t('settings.organization.document'), '') +
+        fld('site', t('settings.organization.site'), '') +
+        '<button type="submit" class="h-11 rounded-lg bg-brand-500 px-5 text-sm font-medium text-white hover:bg-brand-600">' + t('settings.organization.save') + '</button>' +
+        '</form>';
+
+      const NOTIF = ['sales', 'checkin', 'weekly', 'marketing'];
+      const notifPanel =
+        '<div class="max-w-lg divide-themed">' +
+        NOTIF.map((k) =>
+          '<div class="flex items-center justify-between py-4"><span class="text-sm text-body">' + t('settings.notifications.' + k) + '</span>' + UI.switchToggle(notifPrefs[k], 'onclick="toggleNotif(\'' + k + '\', this)"') + '</div>'
+        ).join('') +
+        '</div>';
+
+      const tabsHtml = UI.tabs([
+        { label: t('settings.tabs.profile'), icon: 'user', content: profilePanel },
+        { label: t('settings.tabs.organization'), icon: 'building', content: orgPanel },
+        { label: t('settings.tabs.notifications'), icon: 'bell', content: notifPanel },
+      ], activeTab);
+
+      document.getElementById('page').innerHTML =
+        UI.pageHeader({ title: t('settings.title'), subtitle: t('settings.subtitle') }) +
+        '<div class="surface-card rounded-2xl border p-5">' + tabsHtml + '</div>';
+    };
+  </script>
+  <script src="assets/js/layout.js"></script>
+</body>
+</html>

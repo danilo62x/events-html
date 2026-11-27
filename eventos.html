@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <title>Eventos — Ingressos & Bilheteria</title>
+  <link rel="stylesheet" href="assets/css/tailwind.css" />
+  <script src="assets/js/state.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/format.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/ev.js"></script>
+  <script src="assets/js/query.js"></script>
+  <script src="assets/js/icons.js"></script>
+  <script src="assets/js/i18n.js"></script>
+</head>
+<body data-shell="public">
+  <div id="app"><div id="page"></div></div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const filters = {
+      query: params.get('q') || '',
+      category: params.get('cat') || '',
+      city: '',
+      fromDate: '',
+    };
+    let page = 1;
+    const PER_PAGE = 9;
+
+    window.onFilterChange = function (name, value) {
+      filters[name] = value;
+      page = 1;
+      window.renderPage();
+    };
+    window.onPageChange = function (p) {
+      page = p;
+      window.renderPage();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    window.renderPage = function () {
+      const t = UI.t;
+      const st = EventsStore.get();
+      const published = Query.publishedEvents(st.events);
+      const list = Query.filterEvents(published, filters);
+      const paged = Query.paginate(list, page, PER_PAGE);
+      page = paged.page;
+
+      const catOptions = [{ value: '', label: t('events.allCategories') }].concat(
+        Data.CATEGORIES.map((c) => ({ value: c, label: t('categories.' + c) }))
+      );
+      const cityOptions = [{ value: '', label: t('events.allCities') }].concat(
+        Query.uniqueCities(published).map((c) => ({ value: c, label: c }))
+      );
+
+      const bar = UI.filterBar(
+        UI.searchInput(filters.query, t('events.searchPlaceholder'), 'query') +
+        UI.selectInput('category', catOptions, filters.category) +
+        UI.selectInput('city', cityOptions, filters.city) +
+        '<input type="date" data-filter="fromDate" value="' + filters.fromDate + '" class="h-11 rounded-lg border border-themed bg-transparent px-3 text-sm text-body outline-none focus:border-brand-300 focus-ring"/>'
+      );
+
+      const grid = paged.items.length
+        ? '<div class="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">' + paged.items.map((e) => UI.eventCard(e)).join('') + '</div>'
+        : UI.emptyState({ icon: 'calendar', title: t('events.empty'), description: t('events.emptyDesc') });
+
+      document.getElementById('page').innerHTML =
+        '<div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">' +
+        '<h1 class="text-3xl font-bold text-heading">' + t('events.title') + '</h1>' +
+        '<p class="mt-1 text-muted">' + t('events.subtitle') + '</p>' +
+        '<div class="mt-6">' + bar + '</div>' +
+        grid +
+        (paged.totalPages > 1 ? '<div class="mt-10">' + UI.pagination(paged.page, paged.totalPages) + '</div>' : '') +
+        '</div>';
+    };
+  </script>
+  <script src="assets/js/layout.js"></script>
+</body>
+</html>

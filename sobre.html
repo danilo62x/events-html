@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <title>Eventos — Ingressos & Bilheteria</title>
+  <link rel="stylesheet" href="assets/css/tailwind.css" />
+  <script src="assets/js/state.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/format.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/ev.js"></script>
+  <script src="assets/js/query.js"></script>
+  <script src="assets/js/icons.js"></script>
+  <script src="assets/js/i18n.js"></script>
+</head>
+<body data-shell="public">
+  <div id="app"><div id="page"></div></div>
+
+  <script>
+    window.renderPage = function () {
+      const t = UI.t, icon = UI.icon;
+
+      const VALUES = [
+        { key: 'simple', icon: 'zap' },
+        { key: 'secure', icon: 'shield-check' },
+        { key: 'scale', icon: 'trending-up' },
+      ];
+      const STATS = [
+        { value: '480k', key: 'tickets' },
+        { value: '12k+', key: 'events' },
+        { value: '90+', key: 'cities' },
+        { value: '4.8/5', key: 'rating' },
+      ];
+
+      const valueCards = VALUES.map((v) =>
+        '<div class="surface-card rounded-2xl border p-6"><span class="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 text-brand-500 dark:bg-brand-500/15">' + icon(v.icon, { size: 24 }) + '</span><h3 class="mt-5 text-lg font-semibold text-heading">' + t('about.values.' + v.key) + '</h3><p class="mt-2 text-sm text-muted">' + t('about.values.' + v.key + 'Desc') + '</p></div>'
+      ).join('');
+      const statCards = STATS.map((s) =>
+        '<div class="surface-card rounded-2xl border p-5 text-center"><p class="text-2xl font-bold text-heading sm:text-3xl">' + s.value + '</p><p class="mt-1 text-xs text-muted">' + t('about.stats.' + s.key) + '</p></div>'
+      ).join('');
+
+      document.getElementById('tx-main').innerHTML =
+        '<section class="mx-auto max-w-3xl px-4 py-16 text-center sm:px-6 lg:px-8"><h1 class="text-4xl font-bold text-heading">' + t('about.title') + '</h1><p class="mx-auto mt-4 max-w-2xl text-lg text-muted">' + t('about.subtitle') + '</p></section>' +
+        '<section class="mx-auto max-w-7xl px-4 pb-8 sm:px-6 lg:px-8"><div class="grid grid-cols-2 gap-4 sm:grid-cols-4">' + statCards + '</div></section>' +
+        '<section class="border-y border-themed surface-card"><div class="mx-auto max-w-3xl px-4 py-16 text-center sm:px-6 lg:px-8"><h2 class="text-3xl font-bold text-heading">' + t('about.missionTitle') + '</h2><p class="mt-4 text-muted">' + t('about.missionText') + '</p></div></section>' +
+        '<section class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8"><h2 class="text-center text-3xl font-bold text-heading">' + t('about.values.title') + '</h2><div class="mt-10 grid gap-6 sm:grid-cols-3">' + valueCards + '</div></section>';
+    };
+  </script>
+  <script src="assets/js/layout.js"></script>
+</body>
+</html>

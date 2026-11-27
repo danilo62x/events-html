@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <title>Eventos — Ingressos & Bilheteria</title>
+  <link rel="stylesheet" href="assets/css/tailwind.css" />
+  <script src="assets/js/state.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/format.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/ev.js"></script>
+  <script src="assets/js/query.js"></script>
+  <script src="assets/js/icons.js"></script>
+  <script src="assets/js/i18n.js"></script>
+</head>
+<body data-shell="public">
+  <div id="app"><div id="page"></div></div>
+
+  <script>
+    window.renderPage = function () {
+      const t = UI.t, icon = UI.icon;
+      const st = EventsStore.get();
+      // Demo: show the buyer's emitted tickets (mirrors the React "Meus ingressos").
+      const tickets = st.tickets.slice(0, 12);
+
+      const demoBanner =
+        '<div class="surface-card mb-6 flex items-start gap-3 rounded-2xl border border-brand-200 bg-brand-50 p-4 dark:border-brand-500/30 dark:bg-brand-500/10"><span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-500 text-white">' + icon('qr-code', { size: 20 }) + '</span><div><p class="text-sm font-semibold text-heading">' + t('tickets.demoTitle') + '</p><p class="text-xs text-muted">' + t('tickets.demoDesc') + '</p></div></div>';
+
+      let body;
+      if (tickets.length === 0) {
+        body = UI.emptyState({
+          icon: 'ticket',
+          title: t('tickets.empty'),
+          description: t('tickets.emptyDesc'),
+          action: '<a href="eventos.html" class="inline-flex rounded-lg bg-brand-500 px-6 py-3 text-sm font-medium text-white hover:bg-brand-600">' + t('tickets.explore') + '</a>',
+        });
+      } else {
+        body =
+          '<p class="mb-4 flex items-center gap-2 text-sm text-muted">' + icon('info', { size: 16 }) + t('tickets.scanHint') + '</p>' +
+          '<div class="grid grid-cols-1 gap-5 lg:grid-cols-2">' + tickets.map((tk) => UI.ticketCard(tk)).join('') + '</div>';
+      }
+
+      document.getElementById('page').innerHTML =
+        '<div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">' +
+        '<h1 class="text-3xl font-bold text-heading">' + t('tickets.title') + '</h1>' +
+        '<p class="mt-1 text-muted">' + t('tickets.subtitle') + '</p>' +
+        '<div class="mt-6">' + demoBanner + body + '</div>' +
+        '</div>';
+    };
+  </script>
+  <script src="assets/js/layout.js"></script>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <title>Eventos — Ingressos & Bilheteria</title>
+  <link rel="stylesheet" href="assets/css/tailwind.css" />
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.49.1/dist/apexcharts.min.js"></script>
+  <script src="assets/js/state.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/format.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/ev.js"></script>
+  <script src="assets/js/query.js"></script>
+  <script src="assets/js/icons.js"></script>
+  <script src="assets/js/i18n.js"></script>
+</head>
+<body data-shell="app" data-guard="true">
+  <div id="app"><div id="page"></div></div>
+
+  <script>
+    let charts = [];
+
+    window.renderPage = function () {
+      const t = UI.t, icon = UI.icon;
+      const st = EventsStore.get();
+      const user = Auth.getUser();
+      const m = Query.computeMetrics(st.orders, st.tickets);
+      const upcoming = Query.upcomingEvents(st.events, 5);
+      const recent = Query.recentOrders(st.orders, 6);
+
+      const kpis =
+        UI.kpiCard({ title: t('dashboard.kpis.sales'), value: m.totalSales, icon: 'shopping-cart', accent: 'brand', trend: 'up', trendValue: '9%' }) +
+        UI.kpiCard({ title: t('dashboard.kpis.ticketsSold'), value: m.ticketsSold, icon: 'ticket', accent: 'info', trend: 'up', trendValue: '14%' }) +
+        UI.kpiCard({ title: t('dashboard.kpis.revenue'), value: UI.fmtCompact(m.revenue), icon: 'dollar', accent: 'success', trend: 'up', trendValue: '6%' }) +
+        UI.kpiCard({ title: t('dashboard.kpis.checkInRate'), value: m.checkInRate + '%', icon: 'scan', accent: 'warning' });
+
+      const upcomingRows = upcoming.length
+        ? '<ul class="mt-4 divide-themed">' + upcoming.map((e) =>
+            '<li class="flex items-center gap-3 py-3"><img src="' + e.cover + '" alt="" class="h-12 w-16 shrink-0 rounded-lg object-cover"/><div class="flex-1 min-w-0"><a href="app-evento.html?id=' + e.id + '" class="block truncate text-sm font-medium text-heading hover:text-brand-600">' + e.title + '</a><p class="text-xs text-muted">' + UI.fmtDateTime(e.date) + ' · ' + e.city + '</p></div>' + UI.statusPill('event', e.status) + '</li>'
+          ).join('') + '</ul>'
+        : '<p class="mt-6 text-center text-sm text-muted">' + t('dashboard.noUpcoming') + '</p>';
+
+      const recentRows = recent.map((o) =>
+        '<tr class="border-b border-themed last:border-0"><td class="py-3 pr-4 font-medium text-heading">' + o.lines[0].eventTitle + '</td><td class="py-3 pr-4 text-muted">' + o.buyerName + '</td><td class="py-3 pr-4">' + UI.statusPill('order', o.status) + '</td><td class="py-3 text-right font-semibold text-heading">' + UI.fmt(o.total) + '</td></tr>'
+      ).join('');
+
+      document.getElementById('page').innerHTML =
+        UI.pageHeader({ title: t('dashboard.title'), subtitle: t('dashboard.welcome', { name: (user && user.name) || '' }), action: '<a href="app-eventos.html" class="flex h-10 items-center gap-2 rounded-lg bg-brand-500 px-4 text-sm font-medium text-white transition hover:bg-brand-600">' + icon('plus', { size: 16 }) + t('appNav.newEvent') + '</a>' }) +
+        '<div class="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">' + kpis + '</div>' +
+        '<div class="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-3">' +
+        '<div class="surface-card rounded-2xl border p-5 xl:col-span-2"><h3 class="text-base font-semibold text-heading">' + t('dashboard.salesTitle') + '</h3><div class="mt-4" id="chart-sales"></div></div>' +
+        '<div class="surface-card rounded-2xl border p-5"><h3 class="text-base font-semibold text-heading">' + t('dashboard.categoryTitle') + '</h3><div class="mt-4" id="chart-category"></div></div>' +
+        '</div>' +
+        '<div class="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-3">' +
+        '<div class="surface-card rounded-2xl border p-5 xl:col-span-2"><div class="flex items-center justify-between"><h3 class="text-base font-semibold text-heading">' + t('dashboard.recentSales') + '</h3><a href="app-financeiro.html" class="text-sm font-medium text-brand-600 hover:text-brand-700">' + t('common.viewAll') + '</a></div><div class="mt-4 overflow-x-auto"><table class="w-full text-left text-sm"><thead><tr class="border-b border-themed text-muted"><th class="pb-2 pr-4 font-medium">' + t('events.title') + '</th><th class="pb-2 pr-4 font-medium">' + t('checkout.buyer') + '</th><th class="pb-2 pr-4 font-medium">' + t('manage.columns.status') + '</th><th class="pb-2 text-right font-medium">' + t('cart.total') + '</th></tr></thead><tbody>' + recentRows + '</tbody></table></div></div>' +
+        '<div class="surface-card rounded-2xl border p-5"><div class="flex items-center justify-between"><h3 class="text-base font-semibold text-heading">' + t('dashboard.upcomingTitle') + '</h3><a href="app-eventos.html" class="text-sm font-medium text-brand-600 hover:text-brand-700">' + t('dashboard.manage') + '</a></div>' + upcomingRows + '</div>' +
+        '</div>';
+
+      renderCharts();
+    };
+
+    function renderCharts() {
+      if (typeof ApexCharts === 'undefined') return;
+      charts.forEach((c) => c.destroy());
+      charts = [];
+      const t = UI.t;
+      const dark = UIState.get().darkMode;
+      const baseText = dark ? '#98a2b3' : '#667085';
+      const grid = dark ? '#1f2937' : '#e4e7ec';
+      const common = {
+        chart: { fontFamily: 'Outfit, sans-serif', toolbar: { show: false }, foreColor: baseText },
+        grid: { borderColor: grid, strokeDashArray: 3 },
+        dataLabels: { enabled: false },
+        tooltip: { theme: dark ? 'dark' : 'light' },
+      };
+      const S = Query.salesSeries();
+      const C = Query.byCategory();
+
+      const salesEl = document.getElementById('chart-sales');
+      if (salesEl) {
+        const c = new ApexCharts(salesEl, Object.assign({}, common, {
+          chart: Object.assign({}, common.chart, { type: 'area', height: 300 }),
+          series: [
+            { name: t('dashboard.salesLegend.tickets'), data: S.sales },
+            { name: t('dashboard.salesLegend.revenue'), data: S.revenue.map((v) => Math.round(v / 100)) },
+          ],
+          xaxis: { categories: S.categories },
+          stroke: { curve: 'smooth', width: 2 },
+          fill: { type: 'gradient', gradient: { opacityFrom: 0.4, opacityTo: 0.05 } },
+          legend: { show: true, position: 'top' },
+          colors: ['#465fff', '#12b76a'],
+        }));
+        c.render();
+        charts.push(c);
+      }
+
+      const catEl = document.getElementById('chart-category');
+      if (catEl) {
+        const c = new ApexCharts(catEl, Object.assign({}, common, {
+          chart: Object.assign({}, common.chart, { type: 'donut', height: 300 }),
+          series: C.map((d) => d.revenue),
+          labels: C.map((d) => t('categories.' + d.category)),
+          legend: { show: true, position: 'bottom' },
+          plotOptions: { pie: { donut: { size: '62%' } } },
+          colors: ['#465fff', '#f04438', '#12b76a', '#f79009', '#0ba5ec'],
+        }));
+        c.render();
+        charts.push(c);
+      }
+    }
+
+    window.onThemeChange = renderCharts;
+  </script>
+  <script src="assets/js/layout.js"></script>
+</body>
+</html>

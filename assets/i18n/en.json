@@ -1,0 +1,433 @@
+{
+  "brand": "Eventix",
+  "common": {
+    "search": "Search",
+    "noResults": "No results found.",
+    "previous": "Previous",
+    "next": "Next",
+    "back": "Back",
+    "continue": "Continue",
+    "viewAll": "View all",
+    "save": "Save",
+    "cancel": "Cancel",
+    "create": "Create",
+    "edit": "Edit",
+    "remove": "Remove",
+    "delete": "Delete",
+    "clear": "Clear",
+    "close": "Close",
+    "confirm": "Confirm",
+    "theme": "Theme",
+    "loading": "Loading…",
+    "optional": "optional"
+  },
+  "nav": {
+    "events": "Events",
+    "myTickets": "My tickets",
+    "about": "About",
+    "contact": "Contact",
+    "cart": "Cart",
+    "login": "Sign in",
+    "organizer": "Organizer area",
+    "dashboard": "Dashboard"
+  },
+  "footer": {
+    "tagline": "The platform to discover amazing events and sell tickets without the hassle.",
+    "rights": "All rights reserved.",
+    "help": "Help",
+    "terms": "Terms",
+    "privacy": "Privacy"
+  },
+  "appNav": {
+    "main": "Main",
+    "operations": "Operations",
+    "insights": "Account",
+    "dashboard": "Dashboard",
+    "events": "My events",
+    "checkin": "Check-in",
+    "attendees": "Attendees",
+    "finance": "Finance",
+    "settings": "Settings",
+    "collapse": "Collapse",
+    "logout": "Log out",
+    "notifications": "Notifications",
+    "searchPlaceholder": "Search events, orders…",
+    "viewSite": "View site",
+    "newEvent": "Create event",
+    "proTitle": "Pro plan",
+    "proDesc": "Lower fees and advanced reports."
+  },
+  "notifications": {
+    "sale": "New sale on {{name}}",
+    "checkin": "Check-in recorded at {{name}}",
+    "soldOut": "Tier sold out: {{name}}"
+  },
+  "categories": {
+    "show": "Concert",
+    "teatro": "Theater",
+    "curso": "Course",
+    "esporte": "Sports",
+    "festa": "Party"
+  },
+  "eventStatus": {
+    "published": "Published",
+    "draft": "Draft",
+    "ended": "Ended"
+  },
+  "orderStatus": {
+    "paid": "Paid",
+    "pending": "Pending"
+  },
+  "home": {
+    "heroBadge": "Over 1,200 events a month",
+    "heroTitle": "Live unforgettable experiences",
+    "heroSubtitle": "Find concerts, theater, courses and parties near you and grab your ticket in seconds.",
+    "heroSearch": "What do you want to experience today?",
+    "heroCta": "Explore events",
+    "heroSecondary": "I'm an organizer",
+    "featuredTitle": "Featured",
+    "featuredSubtitle": "The most sought-after events this week.",
+    "categoriesTitle": "Browse by category",
+    "upcomingTitle": "Upcoming events",
+    "upcomingSubtitle": "Don't miss what's coming.",
+    "ctaTitle": "Planning an event?",
+    "ctaSubtitle": "Build your page, set up tiers and sell tickets with QR Code check-in.",
+    "ctaButton": "Get started",
+    "stats": {
+      "events": "Events hosted",
+      "tickets": "Tickets sold",
+      "cities": "Cities",
+      "organizers": "Organizers"
+    }
+  },
+  "events": {
+    "title": "All events",
+    "subtitle": "{{count}} events found",
+    "searchPlaceholder": "Search by name, venue or organizer",
+    "allCategories": "All categories",
+    "allCities": "All cities",
+    "empty": "No events found",
+    "emptyDesc": "Try adjusting the filters or searching another term."
+  },
+  "event": {
+    "from": "From",
+    "buy": "Buy",
+    "soldOut": "Sold out",
+    "remaining": "{{count}} left",
+    "about": "About the event",
+    "when": "Date and time",
+    "where": "Venue",
+    "organizer": "Organizer",
+    "tickets": "Tickets",
+    "selectTickets": "Select your tickets",
+    "addToCart": "Add to cart",
+    "addedToCart": "Tickets added to cart",
+    "selectAtLeastOne": "Select at least one ticket",
+    "viewMap": "View on map",
+    "notFound": "Event not found",
+    "notFoundDesc": "The event you are looking for does not exist or was removed.",
+    "backToEvents": "Back to events",
+    "total": "Total"
+  },
+  "cart": {
+    "title": "Cart",
+    "subtitle": "Review your tickets before checking out.",
+    "empty": "Your cart is empty",
+    "emptyDesc": "Browse events and add tickets to continue.",
+    "explore": "Explore events",
+    "summary": "Summary",
+    "subtotal": "Subtotal",
+    "fee": "Service fee",
+    "total": "Total",
+    "checkout": "Checkout",
+    "continue": "Keep browsing",
+    "items_one": "{{count}} item",
+    "items_other": "{{count}} items"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "buyer": "Buyer details",
+    "name": "Full name",
+    "email": "Email",
+    "phone": "Phone",
+    "cpf": "Tax ID",
+    "payment": "Payment",
+    "card": "Card",
+    "pix": "Pix",
+    "boleto": "Bank slip",
+    "cardNumber": "Card number",
+    "cardName": "Name on card",
+    "cardExpiry": "Expiry",
+    "cardCvv": "CVV",
+    "pixInfo": "After confirming, we'll show a Pix QR Code for instant payment.",
+    "boletoInfo": "A bank slip will be generated and the order stays pending until cleared.",
+    "summary": "Order summary",
+    "placeOrder": "Confirm and issue tickets",
+    "success": "Purchase confirmed! Your tickets were issued.",
+    "validation": {
+      "required": "Required field",
+      "email": "Invalid email",
+      "min": "Too short"
+    },
+    "done": {
+      "title": "Order confirmed!",
+      "subtitle": "Your tickets are now available under My tickets.",
+      "code": "Order code",
+      "viewTickets": "View my tickets"
+    }
+  },
+  "tickets": {
+    "title": "My tickets",
+    "subtitle": "Your tickets with QR Code for event access.",
+    "empty": "You don't have tickets yet",
+    "emptyDesc": "When you buy tickets they'll appear here with the QR Code.",
+    "explore": "Explore events",
+    "scanHint": "Show the QR Code at the entrance",
+    "demoTitle": "Demo tickets",
+    "demoDesc": "The tickets below are samples. Make a purchase to issue your own."
+  },
+  "about": {
+    "title": "About Eventix",
+    "subtitle": "We connect people to experiences and give organizers the tools to sell more.",
+    "missionTitle": "Our mission",
+    "missionText": "Make it simple to discover, buy and run events — from the neighborhood gig to the national festival.",
+    "values": {
+      "title": "What drives us",
+      "simple": "Simplicity",
+      "simpleDesc": "Buy and manage tickets in a few clicks.",
+      "secure": "Security",
+      "secureDesc": "QR Code check-in and protected data.",
+      "scale": "Scale",
+      "scaleDesc": "From 50 to 50,000 tickets without slowing down."
+    },
+    "stats": {
+      "tickets": "Tickets issued",
+      "events": "Events published",
+      "cities": "Cities served",
+      "rating": "Satisfaction"
+    }
+  },
+  "contact": {
+    "title": "Get in touch",
+    "subtitle": "Have a question or want to bring your event to Eventix? Write to us.",
+    "name": "Name",
+    "email": "Email",
+    "subject": "Subject",
+    "message": "Message",
+    "send": "Send message",
+    "success": "Message sent! We'll get back to you soon.",
+    "infoTitle": "Other channels",
+    "phone": "Phone",
+    "address": "Address",
+    "validation": {
+      "required": "Required field",
+      "email": "Invalid email"
+    }
+  },
+  "auth": {
+    "loginTitle": "Sign in to your account",
+    "loginSubtitle": "Sign in to manage your events and sales.",
+    "registerTitle": "Create your account",
+    "registerSubtitle": "Start selling tickets in minutes.",
+    "name": "Full name",
+    "email": "Email",
+    "password": "Password",
+    "remember": "Keep me signed in",
+    "forgot": "Forgot password?",
+    "loginCta": "Sign in",
+    "registerCta": "Create account",
+    "loggingIn": "Signing in…",
+    "registering": "Creating…",
+    "loginSuccess": "Welcome back!",
+    "registerSuccess": "Account created successfully!",
+    "loginError": "Could not sign in. Check your details.",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "demoTitle": "Demo account",
+    "demoHint": "Any email and password also work."
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Good to see you, {{name}}.",
+    "kpis": {
+      "sales": "Sales",
+      "ticketsSold": "Tickets sold",
+      "revenue": "Revenue",
+      "checkInRate": "Check-in rate"
+    },
+    "salesTitle": "Sales and revenue",
+    "salesLegend": {
+      "tickets": "Tickets",
+      "revenue": "Revenue"
+    },
+    "categoryTitle": "Revenue by category",
+    "upcomingTitle": "Upcoming events",
+    "recentSales": "Recent sales",
+    "noUpcoming": "No upcoming events.",
+    "manage": "Manage"
+  },
+  "manage": {
+    "title": "My events",
+    "subtitle": "Create, edit and publish your events.",
+    "newEvent": "New event",
+    "createTitle": "Create event",
+    "editTitle": "Edit event",
+    "columns": {
+      "event": "Event",
+      "date": "Date",
+      "city": "City",
+      "status": "Status",
+      "sold": "Sold",
+      "actions": "Actions"
+    },
+    "form": {
+      "title": "Title",
+      "category": "Category",
+      "date": "Date and time",
+      "venue": "Venue",
+      "city": "City",
+      "address": "Address",
+      "organizer": "Organizer",
+      "description": "Description",
+      "cover": "Cover URL"
+    },
+    "publish": "Publish",
+    "unpublish": "End",
+    "manageSales": "Sales & tiers",
+    "created": "Event created!",
+    "updated": "Event updated!",
+    "published": "Event published!",
+    "ended": "Event ended.",
+    "validation": {
+      "required": "Required field"
+    }
+  },
+  "sales": {
+    "title": "Sales & tiers",
+    "tabs": {
+      "tiers": "Tiers",
+      "orders": "Orders"
+    },
+    "kpis": {
+      "sold": "Tickets sold",
+      "revenue": "Revenue",
+      "remaining": "Available"
+    },
+    "tierColumns": {
+      "tier": "Tier",
+      "price": "Price",
+      "sold": "Sold",
+      "total": "Total",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "orderColumns": {
+      "code": "Code",
+      "buyer": "Buyer",
+      "qty": "Qty",
+      "total": "Total",
+      "status": "Status",
+      "date": "Date"
+    },
+    "addTier": "Add tier",
+    "editTier": "Edit tier",
+    "tierName": "Tier name",
+    "tierPrice": "Price",
+    "tierTotal": "Total quantity",
+    "tierActive": "Tier active (on sale)",
+    "active": "Active",
+    "closed": "Closed",
+    "tierSaved": "Tier saved!",
+    "noOrders": "No orders for this event yet."
+  },
+  "checkin": {
+    "title": "Check-in",
+    "subtitle": "Validate tickets at the event entrance.",
+    "scannerTitle": "Validate ticket",
+    "scannerDesc": "Type or scan the ticket code.",
+    "placeholder": "Ticket code (e.g. TK…)",
+    "validate": "Validate",
+    "success": "Check-in completed!",
+    "validated": "Valid ticket — entry granted",
+    "already": "Ticket already used",
+    "alreadyToast": "This ticket has already checked in.",
+    "notfound": "Ticket not found",
+    "notfoundToast": "Invalid code.",
+    "done": "Checked in",
+    "pending": "Waiting",
+    "recentTitle": "Recent check-ins",
+    "tryCode": "Tip: copy a code from the Attendees tab to test."
+  },
+  "attendees": {
+    "title": "Attendees",
+    "subtitle": "All attendees with issued tickets.",
+    "allEvents": "All events",
+    "columns": {
+      "attendee": "Attendee",
+      "tier": "Tier",
+      "code": "Code",
+      "purchased": "Purchased",
+      "status": "Check-in"
+    },
+    "copyCode": "Code copied!"
+  },
+  "finance": {
+    "title": "Finance",
+    "subtitle": "Revenue, fees and payouts for your events.",
+    "kpis": {
+      "gross": "Gross revenue",
+      "fees": "Fees",
+      "net": "Net payout",
+      "pending": "Receivable"
+    },
+    "byEventTitle": "Revenue by event",
+    "columns": {
+      "event": "Event",
+      "sold": "Sold",
+      "gross": "Gross",
+      "fee": "Fee",
+      "net": "Net"
+    },
+    "payoutNote": "Payouts are processed within 7 days after the event."
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Manage your profile and preferences.",
+    "tabs": {
+      "profile": "Profile",
+      "organization": "Organization",
+      "notifications": "Notifications"
+    },
+    "profile": {
+      "name": "Name",
+      "email": "Email",
+      "role": "Role",
+      "save": "Save profile"
+    },
+    "organization": {
+      "name": "Organization name",
+      "document": "Tax number",
+      "site": "Website",
+      "save": "Save organization"
+    },
+    "notifications": {
+      "sales": "Notify on each sale",
+      "checkin": "Check-in summary",
+      "weekly": "Weekly report",
+      "marketing": "News and tips"
+    },
+    "saved": "Settings saved!"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "subtitle": "The page you are looking for doesn't exist or was moved.",
+    "home": "Back home"
+  },
+  "cookie": {
+    "title": "We use cookies",
+    "desc": "To improve your experience and analyze traffic.",
+    "policy": "Privacy policy",
+    "accept": "Accept",
+    "decline": "Decline"
+  }
+}

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <title>Eventos — Ingressos & Bilheteria</title>
+  <link rel="stylesheet" href="assets/css/tailwind.css" />
+  <script src="assets/js/state.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/format.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/ev.js"></script>
+  <script src="assets/js/query.js"></script>
+  <script src="assets/js/icons.js"></script>
+  <script src="assets/js/i18n.js"></script>
+</head>
+<body data-shell="blank">
+  <div id="app"><div id="page" class="flex min-h-screen items-center justify-center px-4 py-10" style="background-color:var(--tx-body-bg)"></div></div>
+
+  <script>
+    window.onFormSubmit = function (name, form) {
+      if (name !== 'register') return;
+      const t = UI.t;
+      const data = Object.fromEntries(new FormData(form).entries());
+      const btn = form.querySelector('button[type="submit"]');
+      btn.disabled = true;
+      btn.textContent = t('auth.registering');
+      Auth.register(data.name, data.email, data.password).then(function (ok) {
+        if (ok) {
+          UI.notify(t('auth.registerSuccess'), 'success');
+          window.location.href = 'app.html';
+        } else {
+          UI.notify(t('contact.validation.required'), 'error');
+          btn.disabled = false;
+          btn.textContent = t('auth.registerCta');
+        }
+      });
+    };
+
+    window.renderPage = function () {
+      const t = UI.t, icon = UI.icon;
+      const fld = (n, label, type) =>
+        '<label class="block"><span class="text-sm font-medium text-body">' + label + '</span><input required type="' + (type || 'text') + '" name="' + n + '" class="mt-1.5 h-11 w-full rounded-lg border border-themed bg-transparent px-3 text-sm text-body outline-none focus:border-brand-300 focus-ring"/></label>';
+
+      document.getElementById('page').innerHTML =
+        '<div class="w-full max-w-md">' +
+        '<a href="index.html" class="flex items-center justify-center gap-2.5"><span class="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-500 text-white shadow-theme-md">' + icon('ticket', { size: 20 }) + '</span><span class="text-xl font-bold text-heading">' + t('brand') + '</span></a>' +
+        '<div class="surface-card mt-8 rounded-2xl border p-7">' +
+        '<h1 class="text-2xl font-bold text-heading">' + t('auth.registerTitle') + '</h1>' +
+        '<p class="mt-1 text-sm text-muted">' + t('auth.registerSubtitle') + '</p>' +
+        '<form data-page-form="register" class="mt-6 space-y-4">' +
+        fld('name', t('auth.name')) +
+        fld('email', t('auth.email'), 'email') +
+        fld('password', t('auth.password'), 'password') +
+        '<button type="submit" class="flex h-12 w-full items-center justify-center rounded-xl bg-brand-500 text-sm font-semibold text-white transition hover:bg-brand-600">' + t('auth.registerCta') + '</button>' +
+        '</form>' +
+        '<p class="mt-6 text-center text-sm text-muted">' + t('auth.hasAccount') + ' <a href="login.html" class="font-medium text-brand-600 hover:text-brand-700">' + t('auth.loginCta') + '</a></p>' +
+        '</div></div>';
+    };
+  </script>
+  <script src="assets/js/layout.js"></script>
+</body>
+</html>

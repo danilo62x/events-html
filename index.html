@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <title>Eventos — Ingressos & Bilheteria</title>
+  <link rel="stylesheet" href="assets/css/tailwind.css" />
+  <script src="assets/js/state.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/format.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/ev.js"></script>
+  <script src="assets/js/query.js"></script>
+  <script src="assets/js/icons.js"></script>
+  <script src="assets/js/i18n.js"></script>
+</head>
+<body data-shell="public">
+  <div id="app"><div id="page"></div></div>
+
+  <script>
+    window.renderPage = function () {
+      const t = UI.t, icon = UI.icon;
+      const st = EventsStore.get();
+      const featured = Query.featuredEvents(st.events).slice(0, 6);
+      const upcoming = Query.upcomingEvents(st.events, 6);
+
+      const STATS = [
+        { value: '12k+', key: 'events' },
+        { value: '480k', key: 'tickets' },
+        { value: '90+', key: 'cities' },
+        { value: '2.3k', key: 'organizers' },
+      ];
+      const statCards = STATS.map((s) =>
+        '<div><p class="text-3xl font-black text-heading">' + s.value + '</p><p class="mt-1 text-sm text-muted">' + t('home.stats.' + s.key) + '</p></div>'
+      ).join('');
+
+      const hero =
+        '<section class="relative overflow-hidden">' +
+        '<div class="absolute inset-0 -z-10 bg-gradient-to-br from-brand-50 via-white to-brand-100 dark:from-gray-900 dark:via-gray-dark dark:to-gray-900"></div>' +
+        '<div class="absolute -top-24 right-0 -z-10 h-80 w-80 rounded-full bg-brand-200/40 blur-3xl dark:bg-brand-500/10"></div>' +
+        '<div class="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28"><div class="mx-auto max-w-3xl text-center">' +
+        '<span class="inline-flex items-center gap-2 rounded-full border border-themed bg-card-bg px-3 py-1 text-xs font-medium text-brand-600 dark:text-brand-400">' + icon('zap', { size: 14 }) + ' ' + t('home.heroBadge') + '</span>' +
+        '<h1 class="mt-5 text-4xl font-black tracking-tight text-heading sm:text-5xl lg:text-6xl">' + t('home.heroTitle') + '</h1>' +
+        '<p class="mx-auto mt-5 max-w-2xl text-lg text-muted">' + t('home.heroSubtitle') + '</p>' +
+        '<form data-home-search class="mx-auto mt-8 flex max-w-xl gap-2"><div class="relative flex-1"><span class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">' + icon('search', { size: 20 }) + '</span><input data-home-q placeholder="' + t('home.heroSearch') + '" class="surface-card h-12 w-full rounded-xl border pl-12 pr-4 text-sm text-body shadow-theme-sm focus-ring"/></div><button type="submit" class="flex h-12 items-center gap-2 rounded-xl bg-brand-500 px-6 text-sm font-semibold text-white transition hover:bg-brand-600">' + t('home.heroCta') + '</button></form>' +
+        '<div class="mt-12 grid grid-cols-2 gap-6 sm:grid-cols-4">' + statCards + '</div>' +
+        '</div></div></section>';
+
+      const catCards = Data.CATEGORIES.map((c) => {
+        const meta = Data.CATEGORY_META[c];
+        return '<a href="eventos.html?cat=' + c + '" class="surface-card group flex flex-col items-center gap-3 rounded-2xl border p-6 text-center transition hover:-translate-y-0.5 hover:shadow-theme-md"><span class="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-50 text-brand-500 transition group-hover:scale-105 dark:bg-brand-500/15">' + icon(meta.icon, { size: 26 }) + '</span><span class="font-semibold text-heading">' + t('categories.' + c) + '</span></a>';
+      }).join('');
+      const categories =
+        '<section class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8"><h2 class="text-2xl font-bold text-heading">' + t('home.categoriesTitle') + '</h2><div class="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">' + catCards + '</div></section>';
+
+      const featuredGrid = featured.map((e) => UI.eventCard(e)).join('');
+      const featuredSec =
+        '<section class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8"><div class="flex items-end justify-between"><div><h2 class="text-2xl font-bold text-heading">' + t('home.featuredTitle') + '</h2><p class="mt-1 text-sm text-muted">' + t('home.featuredSubtitle') + '</p></div><a href="eventos.html" class="hidden text-sm font-medium text-brand-600 hover:text-brand-700 sm:block">' + t('common.viewAll') + '</a></div><div class="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">' + featuredGrid + '</div></section>';
+
+      const upcomingGrid = upcoming.map((e) => UI.eventCard(e)).join('');
+      const upcomingSec =
+        '<section class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8"><div><h2 class="text-2xl font-bold text-heading">' + t('home.upcomingTitle') + '</h2><p class="mt-1 text-sm text-muted">' + t('home.upcomingSubtitle') + '</p></div><div class="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">' + upcomingGrid + '</div></section>';
+
+      const cta =
+        '<section class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8"><div class="relative overflow-hidden rounded-3xl bg-brand-500 px-8 py-14 text-center text-white"><div class="absolute -right-16 -top-16 h-64 w-64 rounded-full bg-white/10 blur-2xl"></div><h2 class="text-3xl font-bold">' + t('home.ctaTitle') + '</h2><p class="mx-auto mt-3 max-w-xl text-brand-50">' + t('home.ctaSubtitle') + '</p><a href="login.html" class="mt-7 inline-flex h-12 items-center gap-2 rounded-xl bg-white px-7 text-sm font-semibold text-brand-600 transition hover:bg-brand-50">' + t('home.ctaButton') + icon('arrow-right', { size: 18 }) + '</a></div></section>';
+
+      document.getElementById('tx-main').innerHTML = hero + categories + featuredSec + upcomingSec + cta;
+    };
+
+    document.addEventListener('submit', function (e) {
+      const f = e.target.closest('[data-home-search]');
+      if (!f) return;
+      e.preventDefault();
+      const q = (f.querySelector('[data-home-q]').value || '').trim();
+      window.location.href = 'eventos.html' + (q ? '?q=' + encodeURIComponent(q) : '');
+    });
+  </script>
+  <script src="assets/js/layout.js"></script>
+</body>
+</html>

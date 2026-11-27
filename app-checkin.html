@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <title>Eventos — Ingressos & Bilheteria</title>
+  <link rel="stylesheet" href="assets/css/tailwind.css" />
+  <script src="assets/js/state.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/format.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/ev.js"></script>
+  <script src="assets/js/query.js"></script>
+  <script src="assets/js/icons.js"></script>
+  <script src="assets/js/i18n.js"></script>
+</head>
+<body data-shell="app" data-guard="true">
+  <div id="app"><div id="page"></div></div>
+
+  <script>
+    window.onCheckin = function (code, form) {
+      const t = UI.t, icon = UI.icon;
+      const result = EventsStore.checkInTicket(code);
+      const resEl = form.querySelector('[data-checkin-result]');
+      if (result.ok) {
+        UI.notify(t('checkin.success'), 'success');
+        resEl.innerHTML = '<div class="flex items-center gap-3 rounded-xl border border-success-200 bg-success-50 p-4 text-success-700 dark:border-success-500/30 dark:bg-success-500/10">' + icon('check-circle', { size: 22 }) + '<div><p class="text-sm font-semibold">' + t('checkin.validated') + '</p><p class="text-xs">' + result.ticket.attendeeName + ' · ' + result.ticket.eventTitle + '</p></div></div>';
+        form.querySelector('[data-checkin-input]').value = '';
+      } else if (result.reason === 'already') {
+        UI.notify(t('checkin.alreadyToast'), 'warning');
+        resEl.innerHTML = '<div class="flex items-center gap-3 rounded-xl border border-warning-200 bg-warning-50 p-4 text-warning-700 dark:border-warning-500/30 dark:bg-warning-500/10">' + icon('info', { size: 22 }) + '<p class="text-sm font-semibold">' + t('checkin.already') + '</p></div>';
+      } else {
+        UI.notify(t('checkin.notfoundToast'), 'error');
+        resEl.innerHTML = '<div class="flex items-center gap-3 rounded-xl border border-error-200 bg-error-50 p-4 text-error-700 dark:border-error-500/30 dark:bg-error-500/10">' + icon('x', { size: 22 }) + '<p class="text-sm font-semibold">' + t('checkin.notfound') + '</p></div>';
+      }
+      window.refreshRecent();
+    };
+
+    window.refreshRecent = function () {
+      const t = UI.t;
+      const st = EventsStore.get();
+      const recent = st.tickets.filter((x) => x.checkedIn).slice(0, 8);
+      const el = document.getElementById('recent-list');
+      if (!el) return;
+      el.innerHTML = recent.length
+        ? '<ul class="divide-themed">' + recent.map((tk) =>
+            '<li class="flex items-center gap-3 py-3">' + UI.attendeeRow({ name: tk.attendeeName, email: tk.attendeeEmail }) + '<span class="ml-auto font-mono text-xs text-muted">' + tk.code + '</span>' + UI.statusPill('checkin', true) + '</li>'
+          ).join('') + '</ul>'
+        : '<p class="py-6 text-center text-sm text-muted">' + t('common.noResults') + '</p>';
+    };
+
+    window.renderPage = function () {
+      const t = UI.t, icon = UI.icon;
+      document.getElementById('page').innerHTML =
+        UI.pageHeader({ title: t('checkin.title'), subtitle: t('checkin.subtitle') }) +
+        '<div class="grid gap-6 lg:grid-cols-[1fr_400px]">' +
+        '<div>' + UI.checkinScanner() + '<p class="mt-3 flex items-center gap-2 text-xs text-muted">' + icon('info', { size: 14 }) + t('checkin.tryCode') + '</p></div>' +
+        '<div class="surface-card rounded-2xl border p-5"><h3 class="text-base font-semibold text-heading">' + t('checkin.recentTitle') + '</h3><div id="recent-list" class="mt-3"></div></div>' +
+        '</div>';
+      window.refreshRecent();
+    };
+  </script>
+  <script src="assets/js/layout.js"></script>
+</body>
+</html>

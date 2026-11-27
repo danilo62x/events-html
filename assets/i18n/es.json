@@ -1,0 +1,433 @@
+{
+  "brand": "Eventix",
+  "common": {
+    "search": "Buscar",
+    "noResults": "No se encontraron resultados.",
+    "previous": "Anterior",
+    "next": "Siguiente",
+    "back": "Volver",
+    "continue": "Continuar",
+    "viewAll": "Ver todos",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "create": "Crear",
+    "edit": "Editar",
+    "remove": "Quitar",
+    "delete": "Eliminar",
+    "clear": "Limpiar",
+    "close": "Cerrar",
+    "confirm": "Confirmar",
+    "theme": "Tema",
+    "loading": "Cargando…",
+    "optional": "opcional"
+  },
+  "nav": {
+    "events": "Eventos",
+    "myTickets": "Mis entradas",
+    "about": "Acerca de",
+    "contact": "Contacto",
+    "cart": "Carrito",
+    "login": "Entrar",
+    "organizer": "Área del organizador",
+    "dashboard": "Panel"
+  },
+  "footer": {
+    "tagline": "La plataforma para descubrir eventos increíbles y vender entradas sin complicaciones.",
+    "rights": "Todos los derechos reservados.",
+    "help": "Ayuda",
+    "terms": "Términos",
+    "privacy": "Privacidad"
+  },
+  "appNav": {
+    "main": "Principal",
+    "operations": "Operaciones",
+    "insights": "Cuenta",
+    "dashboard": "Panel",
+    "events": "Mis eventos",
+    "checkin": "Check-in",
+    "attendees": "Asistentes",
+    "finance": "Finanzas",
+    "settings": "Configuración",
+    "collapse": "Contraer",
+    "logout": "Salir",
+    "notifications": "Notificaciones",
+    "searchPlaceholder": "Buscar eventos, pedidos…",
+    "viewSite": "Ver sitio",
+    "newEvent": "Crear evento",
+    "proTitle": "Plan Pro",
+    "proDesc": "Tarifas menores e informes avanzados."
+  },
+  "notifications": {
+    "sale": "Nueva venta en {{name}}",
+    "checkin": "Check-in registrado en {{name}}",
+    "soldOut": "Lote agotado: {{name}}"
+  },
+  "categories": {
+    "show": "Concierto",
+    "teatro": "Teatro",
+    "curso": "Curso",
+    "esporte": "Deporte",
+    "festa": "Fiesta"
+  },
+  "eventStatus": {
+    "published": "Publicado",
+    "draft": "Borrador",
+    "ended": "Finalizado"
+  },
+  "orderStatus": {
+    "paid": "Pagado",
+    "pending": "Pendiente"
+  },
+  "home": {
+    "heroBadge": "Más de 1.200 eventos al mes",
+    "heroTitle": "Vive experiencias inolvidables",
+    "heroSubtitle": "Encuentra conciertos, teatro, cursos y fiestas cerca de ti y consigue tu entrada en segundos.",
+    "heroSearch": "¿Qué quieres vivir hoy?",
+    "heroCta": "Explorar eventos",
+    "heroSecondary": "Soy organizador",
+    "featuredTitle": "Destacados",
+    "featuredSubtitle": "Los eventos más buscados de la semana.",
+    "categoriesTitle": "Navega por categoría",
+    "upcomingTitle": "Próximos eventos",
+    "upcomingSubtitle": "No te pierdas lo que viene.",
+    "ctaTitle": "¿Vas a organizar un evento?",
+    "ctaSubtitle": "Crea tu página, configura lotes y vende entradas con check-in por código QR.",
+    "ctaButton": "Empezar ahora",
+    "stats": {
+      "events": "Eventos realizados",
+      "tickets": "Entradas vendidas",
+      "cities": "Ciudades",
+      "organizers": "Organizadores"
+    }
+  },
+  "events": {
+    "title": "Todos los eventos",
+    "subtitle": "{{count}} eventos encontrados",
+    "searchPlaceholder": "Buscar por nombre, lugar u organizador",
+    "allCategories": "Todas las categorías",
+    "allCities": "Todas las ciudades",
+    "empty": "No se encontraron eventos",
+    "emptyDesc": "Prueba a ajustar los filtros o buscar otro término."
+  },
+  "event": {
+    "from": "Desde",
+    "buy": "Comprar",
+    "soldOut": "Agotado",
+    "remaining": "{{count}} restantes",
+    "about": "Sobre el evento",
+    "when": "Fecha y hora",
+    "where": "Lugar",
+    "organizer": "Organización",
+    "tickets": "Entradas",
+    "selectTickets": "Selecciona tus entradas",
+    "addToCart": "Añadir al carrito",
+    "addedToCart": "Entradas añadidas al carrito",
+    "selectAtLeastOne": "Selecciona al menos una entrada",
+    "viewMap": "Ver en el mapa",
+    "notFound": "Evento no encontrado",
+    "notFoundDesc": "El evento que buscas no existe o fue eliminado.",
+    "backToEvents": "Volver a eventos",
+    "total": "Total"
+  },
+  "cart": {
+    "title": "Carrito",
+    "subtitle": "Revisa tus entradas antes de finalizar.",
+    "empty": "Tu carrito está vacío",
+    "emptyDesc": "Explora los eventos y añade entradas para continuar.",
+    "explore": "Explorar eventos",
+    "summary": "Resumen",
+    "subtotal": "Subtotal",
+    "fee": "Tarifa de servicio",
+    "total": "Total",
+    "checkout": "Finalizar compra",
+    "continue": "Seguir explorando",
+    "items_one": "{{count}} artículo",
+    "items_other": "{{count}} artículos"
+  },
+  "checkout": {
+    "title": "Finalizar compra",
+    "buyer": "Datos del comprador",
+    "name": "Nombre completo",
+    "email": "Correo",
+    "phone": "Teléfono",
+    "cpf": "Identificación fiscal",
+    "payment": "Pago",
+    "card": "Tarjeta",
+    "pix": "Pix",
+    "boleto": "Boleto",
+    "cardNumber": "Número de tarjeta",
+    "cardName": "Nombre en la tarjeta",
+    "cardExpiry": "Vencimiento",
+    "cardCvv": "CVV",
+    "pixInfo": "Tras confirmar, mostraremos un código QR Pix para el pago inmediato.",
+    "boletoInfo": "Se generará un boleto y el pedido quedará pendiente hasta la compensación.",
+    "summary": "Resumen del pedido",
+    "placeOrder": "Confirmar y emitir entradas",
+    "success": "¡Compra confirmada! Tus entradas fueron emitidas.",
+    "validation": {
+      "required": "Campo obligatorio",
+      "email": "Correo inválido",
+      "min": "Muy corto"
+    },
+    "done": {
+      "title": "¡Pedido confirmado!",
+      "subtitle": "Tus entradas ya están disponibles en Mis entradas.",
+      "code": "Código del pedido",
+      "viewTickets": "Ver mis entradas"
+    }
+  },
+  "tickets": {
+    "title": "Mis entradas",
+    "subtitle": "Tus entradas con código QR para el acceso al evento.",
+    "empty": "Aún no tienes entradas",
+    "emptyDesc": "Cuando compres entradas aparecerán aquí con el código QR.",
+    "explore": "Explorar eventos",
+    "scanHint": "Presenta el código QR en la entrada",
+    "demoTitle": "Entradas de demostración",
+    "demoDesc": "Las entradas siguientes son ejemplos. Haz una compra para emitir las tuyas."
+  },
+  "about": {
+    "title": "Acerca de Eventix",
+    "subtitle": "Conectamos a las personas con experiencias y damos a los organizadores las herramientas para vender más.",
+    "missionTitle": "Nuestra misión",
+    "missionText": "Hacer simple descubrir, comprar y organizar eventos — desde el concierto de barrio al festival nacional.",
+    "values": {
+      "title": "Lo que nos mueve",
+      "simple": "Simplicidad",
+      "simpleDesc": "Comprar y gestionar entradas en pocos clics.",
+      "secure": "Seguridad",
+      "secureDesc": "Check-in por código QR y datos protegidos.",
+      "scale": "Escala",
+      "scaleDesc": "De 50 a 50.000 entradas sin trabarse."
+    },
+    "stats": {
+      "tickets": "Entradas emitidas",
+      "events": "Eventos publicados",
+      "cities": "Ciudades atendidas",
+      "rating": "Satisfacción"
+    }
+  },
+  "contact": {
+    "title": "Habla con nosotros",
+    "subtitle": "¿Tienes una duda o quieres llevar tu evento a Eventix? Escríbenos.",
+    "name": "Nombre",
+    "email": "Correo",
+    "subject": "Asunto",
+    "message": "Mensaje",
+    "send": "Enviar mensaje",
+    "success": "¡Mensaje enviado! Te responderemos pronto.",
+    "infoTitle": "Otros canales",
+    "phone": "Teléfono",
+    "address": "Dirección",
+    "validation": {
+      "required": "Campo obligatorio",
+      "email": "Correo inválido"
+    }
+  },
+  "auth": {
+    "loginTitle": "Accede a tu cuenta",
+    "loginSubtitle": "Entra para gestionar tus eventos y ventas.",
+    "registerTitle": "Crea tu cuenta",
+    "registerSubtitle": "Empieza a vender entradas en minutos.",
+    "name": "Nombre completo",
+    "email": "Correo",
+    "password": "Contraseña",
+    "remember": "Mantener sesión",
+    "forgot": "¿Olvidaste la contraseña?",
+    "loginCta": "Entrar",
+    "registerCta": "Crear cuenta",
+    "loggingIn": "Entrando…",
+    "registering": "Creando…",
+    "loginSuccess": "¡Bienvenido de nuevo!",
+    "registerSuccess": "¡Cuenta creada con éxito!",
+    "loginError": "No se pudo entrar. Verifica los datos.",
+    "noAccount": "¿Aún no tienes cuenta?",
+    "hasAccount": "¿Ya tienes una cuenta?",
+    "demoTitle": "Cuenta de demostración",
+    "demoHint": "Cualquier correo y contraseña también funcionan."
+  },
+  "dashboard": {
+    "title": "Panel",
+    "welcome": "Qué bueno verte, {{name}}.",
+    "kpis": {
+      "sales": "Ventas",
+      "ticketsSold": "Entradas vendidas",
+      "revenue": "Ingresos",
+      "checkInRate": "Tasa de check-in"
+    },
+    "salesTitle": "Ventas e ingresos",
+    "salesLegend": {
+      "tickets": "Entradas",
+      "revenue": "Ingresos"
+    },
+    "categoryTitle": "Ingresos por categoría",
+    "upcomingTitle": "Próximos eventos",
+    "recentSales": "Ventas recientes",
+    "noUpcoming": "No hay eventos próximos.",
+    "manage": "Gestionar"
+  },
+  "manage": {
+    "title": "Mis eventos",
+    "subtitle": "Crea, edita y publica tus eventos.",
+    "newEvent": "Nuevo evento",
+    "createTitle": "Crear evento",
+    "editTitle": "Editar evento",
+    "columns": {
+      "event": "Evento",
+      "date": "Fecha",
+      "city": "Ciudad",
+      "status": "Estado",
+      "sold": "Vendidas",
+      "actions": "Acciones"
+    },
+    "form": {
+      "title": "Título",
+      "category": "Categoría",
+      "date": "Fecha y hora",
+      "venue": "Lugar",
+      "city": "Ciudad",
+      "address": "Dirección",
+      "organizer": "Organización",
+      "description": "Descripción",
+      "cover": "URL de portada"
+    },
+    "publish": "Publicar",
+    "unpublish": "Finalizar",
+    "manageSales": "Ventas y lotes",
+    "created": "¡Evento creado!",
+    "updated": "¡Evento actualizado!",
+    "published": "¡Evento publicado!",
+    "ended": "Evento finalizado.",
+    "validation": {
+      "required": "Campo obligatorio"
+    }
+  },
+  "sales": {
+    "title": "Ventas y lotes",
+    "tabs": {
+      "tiers": "Lotes",
+      "orders": "Pedidos"
+    },
+    "kpis": {
+      "sold": "Entradas vendidas",
+      "revenue": "Ingresos",
+      "remaining": "Disponibles"
+    },
+    "tierColumns": {
+      "tier": "Lote",
+      "price": "Precio",
+      "sold": "Vendidas",
+      "total": "Total",
+      "status": "Estado",
+      "actions": "Acciones"
+    },
+    "orderColumns": {
+      "code": "Código",
+      "buyer": "Comprador",
+      "qty": "Cant.",
+      "total": "Total",
+      "status": "Estado",
+      "date": "Fecha"
+    },
+    "addTier": "Añadir lote",
+    "editTier": "Editar lote",
+    "tierName": "Nombre del lote",
+    "tierPrice": "Precio",
+    "tierTotal": "Cantidad total",
+    "tierActive": "Lote activo (a la venta)",
+    "active": "Activo",
+    "closed": "Cerrado",
+    "tierSaved": "¡Lote guardado!",
+    "noOrders": "Aún no hay pedidos para este evento."
+  },
+  "checkin": {
+    "title": "Check-in",
+    "subtitle": "Valida entradas en la puerta del evento.",
+    "scannerTitle": "Validar entrada",
+    "scannerDesc": "Escribe o escanea el código de la entrada.",
+    "placeholder": "Código de la entrada (ej.: TK…)",
+    "validate": "Validar",
+    "success": "¡Check-in realizado!",
+    "validated": "Entrada válida — acceso permitido",
+    "already": "Entrada ya utilizada",
+    "alreadyToast": "Esta entrada ya hizo check-in.",
+    "notfound": "Entrada no encontrada",
+    "notfoundToast": "Código inválido.",
+    "done": "Check-in hecho",
+    "pending": "Esperando",
+    "recentTitle": "Check-ins recientes",
+    "tryCode": "Consejo: copia un código de la pestaña Asistentes para probar."
+  },
+  "attendees": {
+    "title": "Asistentes",
+    "subtitle": "Todos los asistentes con entradas emitidas.",
+    "allEvents": "Todos los eventos",
+    "columns": {
+      "attendee": "Asistente",
+      "tier": "Lote",
+      "code": "Código",
+      "purchased": "Compra",
+      "status": "Check-in"
+    },
+    "copyCode": "¡Código copiado!"
+  },
+  "finance": {
+    "title": "Finanzas",
+    "subtitle": "Ingresos, tarifas y pagos de tus eventos.",
+    "kpis": {
+      "gross": "Ingreso bruto",
+      "fees": "Tarifas",
+      "net": "Pago neto",
+      "pending": "Por cobrar"
+    },
+    "byEventTitle": "Ingresos por evento",
+    "columns": {
+      "event": "Evento",
+      "sold": "Vendidas",
+      "gross": "Bruto",
+      "fee": "Tarifa",
+      "net": "Neto"
+    },
+    "payoutNote": "Los pagos se procesan hasta 7 días después del evento."
+  },
+  "settings": {
+    "title": "Configuración",
+    "subtitle": "Gestiona tu perfil y preferencias.",
+    "tabs": {
+      "profile": "Perfil",
+      "organization": "Organización",
+      "notifications": "Notificaciones"
+    },
+    "profile": {
+      "name": "Nombre",
+      "email": "Correo",
+      "role": "Rol",
+      "save": "Guardar perfil"
+    },
+    "organization": {
+      "name": "Nombre de la organización",
+      "document": "Identificación fiscal",
+      "site": "Sitio web",
+      "save": "Guardar organización"
+    },
+    "notifications": {
+      "sales": "Avisar en cada venta",
+      "checkin": "Resumen de check-in",
+      "weekly": "Informe semanal",
+      "marketing": "Novedades y consejos"
+    },
+    "saved": "¡Configuración guardada!"
+  },
+  "notFound": {
+    "title": "Página no encontrada",
+    "subtitle": "La página que buscas no existe o fue movida.",
+    "home": "Volver al inicio"
+  },
+  "cookie": {
+    "title": "Usamos cookies",
+    "desc": "Para mejorar tu experiencia y analizar el tráfico.",
+    "policy": "Política de privacidad",
+    "accept": "Aceptar",
+    "decline": "Rechazar"
+  }
+}

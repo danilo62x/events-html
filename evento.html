@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <title>Eventos — Ingressos & Bilheteria</title>
+  <link rel="stylesheet" href="assets/css/tailwind.css" />
+  <script src="assets/js/state.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/format.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/ev.js"></script>
+  <script src="assets/js/query.js"></script>
+  <script src="assets/js/icons.js"></script>
+  <script src="assets/js/i18n.js"></script>
+</head>
+<body data-shell="public">
+  <div id="app"><div id="page"></div></div>
+
+  <script>
+    const slug = new URLSearchParams(window.location.search).get('slug') || '';
+    const quantities = {};
+
+    // Tier qty changes from the selector update the running total.
+    document.addEventListener('qty:change', function (e) {
+      const id = e.detail.id;
+      if (!id) return;
+      quantities[id] = e.detail.value;
+      updateTotal();
+    });
+
+    function updateTotal() {
+      const st = EventsStore.get();
+      const tiers = Query.tiersForEvent(st.tiers, currentEventId);
+      const total = tiers.reduce((s, tier) => s + (quantities[tier.id] || 0) * tier.price, 0);
+      const el = document.getElementById('tier-total');
+      if (el) el.textContent = UI.fmt(total);
+    }
+
+    let currentEventId = null;
+
+    window.addToCart = function () {
+      const t = UI.t;
+      const st = EventsStore.get();
+      const event = Query.eventBySlug(st.events, slug);
+      if (!event) return;
+      const tiers = Query.tiersForEvent(st.tiers, event.id);
+      const count = Object.values(quantities).reduce((s, n) => s + n, 0);
+      if (count === 0) {
+        UI.notify(t('event.selectAtLeastOne'), 'warning');
+        return;
+      }
+      tiers.forEach((tier) => {
+        const qty = quantities[tier.id] || 0;
+        if (qty <= 0) return;
+        Cart.add(
+          {
+            eventId: event.id,
+            eventSlug: event.slug,
+            eventTitle: event.title,
+            cover: event.cover,
+            tierId: tier.id,
+            tierName: tier.name,
+            price: tier.price,
+            remaining: Query.tierRemaining(tier),
+          },
+          qty
+        );
+      });
+      UI.notify(t('event.addedToCart'), 'success');
+      window.location.href = 'carrinho.html';
+    };
+
+    window.renderPage = function () {
+      const t = UI.t, icon = UI.icon;
+      const st = EventsStore.get();
+      const event = Query.eventBySlug(st.events, slug);
+
+      if (!event) {
+        document.getElementById('page').innerHTML =
+          '<div class="mx-auto max-w-3xl px-4 py-20 sm:px-6">' +
+          UI.emptyState({
+            icon: 'calendar',
+            title: t('event.notFound'),
+            description: t('event.notFoundDesc'),
+            action: '<a href="eventos.html" class="inline-flex rounded-lg bg-brand-500 px-6 py-3 text-sm font-medium text-white hover:bg-brand-600">' + t('event.backToEvents') + '</a>',
+          }) +
+          '</div>';
+        return;
+      }
+      currentEventId = event.id;
+      const meta = Data.CATEGORY_META[event.category] || { icon: 'calendar', color: 'brand' };
+      const tiers = Query.tiersForEvent(st.tiers, event.id);
+
+      const infoCard = (ic, label, value, sub) =>
+        '<div class="surface-card flex items-start gap-3 rounded-xl border p-4"><span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-500 dark:bg-brand-500/15">' + icon(ic, { size: 20 }) + '</span><div><p class="text-xs text-muted">' + label + '</p><p class="font-medium text-heading">' + value + '</p>' + (sub ? '<p class="text-sm text-muted">' + sub + '</p>' : '') + '</div></div>';
+
+      const mapBlock =
+        '<div class="mt-8"><h2 class="text-xl font-semibold text-heading">' + t('event.viewMap') + '</h2>' +
+        '<div class="surface-card relative mt-3 overflow-hidden rounded-2xl border">' +
+        '<div class="h-56 w-full opacity-90" style="background-image:linear-gradient(0deg, rgba(70,95,255,0.06), rgba(70,95,255,0.06)), repeating-linear-gradient(0deg, transparent, transparent 28px, var(--tx-border-color, #e4e7ec) 28px, var(--tx-border-color, #e4e7ec) 29px), repeating-linear-gradient(90deg, transparent, transparent 28px, var(--tx-border-color, #e4e7ec) 28px, var(--tx-border-color, #e4e7ec) 29px);background-color:var(--tx-card-bg)"></div>' +
+        '<div class="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center"><span class="flex h-10 w-10 items-center justify-center rounded-full bg-brand-500 text-white shadow-theme-md">' + icon('map-pin', { size: 20 }) + '</span></div>' +
+        '<div class="absolute inset-x-0 bottom-0 flex items-center gap-2 border-t border-themed bg-card-bg/90 px-4 py-3 text-sm backdrop-blur">' + icon('map-pin', { size: 16, className: 'text-brand-500' }) + '<span class="text-body">' + event.address + ' — ' + event.city + '</span></div>' +
+        '</div></div>';
+
+      const main =
+        '<div>' +
+        '<div class="relative overflow-hidden rounded-2xl"><img src="' + event.cover + '" alt="' + event.title + '" class="aspect-[16/9] w-full object-cover"/><div class="absolute left-4 top-4">' + UI.badge(t('categories.' + event.category), meta.color, { icon: meta.icon, solid: true }) + '</div></div>' +
+        '<h1 class="mt-6 text-3xl font-bold text-heading">' + event.title + '</h1>' +
+        '<div class="mt-4 grid gap-4 sm:grid-cols-2">' +
+        infoCard('calendar', t('event.when'), UI.fmtDateTime(event.date)) +
+        infoCard('map-pin', t('event.where'), event.venue, event.city) +
+        '</div>' +
+        '<div class="mt-8"><h2 class="text-xl font-semibold text-heading">' + t('event.about') + '</h2><p class="mt-3 whitespace-pre-line leading-relaxed text-body">' + event.description + '</p><p class="mt-4 flex items-center gap-2 text-sm text-muted">' + icon('building', { size: 16 }) + t('event.organizer') + ': <span class="font-medium text-body">' + event.organizer + '</span></p></div>' +
+        mapBlock +
+        '</div>';
+
+      const aside =
+        '<aside><div class="surface-card sticky top-24 rounded-2xl border p-5">' +
+        '<h2 class="text-lg font-semibold text-heading">' + t('event.selectTickets') + '</h2>' +
+        '<div class="mt-4">' + UI.ticketTierSelector(tiers, quantities) + '</div>' +
+        '<div class="mt-5 flex items-center justify-between border-t border-themed pt-4"><span class="text-sm text-muted">' + t('event.total') + '</span><span id="tier-total" class="text-xl font-bold text-heading">' + UI.fmt(0) + '</span></div>' +
+        '<button type="button" onclick="addToCart()" class="mt-4 flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-brand-500 text-sm font-semibold text-white transition hover:bg-brand-600">' + icon('shopping-cart', { size: 18 }) + t('event.addToCart') + '</button>' +
+        '</div></aside>';
+
+      document.getElementById('page').innerHTML =
+        '<div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">' +
+        UI.breadcrumb([{ label: t('nav.events'), href: 'eventos.html' }, { label: event.title }]) +
+        '<div class="mt-5 grid gap-8 lg:grid-cols-[1fr_380px]">' + main + aside + '</div>' +
+        '</div>';
+      updateTotal();
+    };
+  </script>
+  <script src="assets/js/layout.js"></script>
+</body>
+</html>

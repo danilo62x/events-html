@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <title>Eventos — Ingressos & Bilheteria</title>
+  <link rel="stylesheet" href="assets/css/tailwind.css" />
+  <script src="assets/js/state.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/format.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/ev.js"></script>
+  <script src="assets/js/query.js"></script>
+  <script src="assets/js/icons.js"></script>
+  <script src="assets/js/i18n.js"></script>
+</head>
+<body data-shell="blank">
+  <div id="app"><div id="page" class="flex min-h-screen items-center justify-center px-4 py-10" style="background-color:var(--tx-body-bg)"></div></div>
+
+  <script>
+    const redirect = new URLSearchParams(window.location.search).get('redirect') || 'app.html';
+
+    window.onFormSubmit = function (name, form) {
+      if (name !== 'login') return;
+      const t = UI.t;
+      const data = Object.fromEntries(new FormData(form).entries());
+      const btn = form.querySelector('button[type="submit"]');
+      btn.disabled = true;
+      btn.textContent = t('auth.loggingIn');
+      Auth.login(data.email, data.password).then(function (ok) {
+        if (ok) {
+          UI.notify(t('auth.loginSuccess'), 'success');
+          window.location.href = redirect;
+        } else {
+          UI.notify(t('auth.loginError'), 'error');
+          btn.disabled = false;
+          btn.textContent = t('auth.loginCta');
+        }
+      });
+    };
+
+    window.renderPage = function () {
+      const t = UI.t, icon = UI.icon;
+      const demo = Auth.DEMO_CREDENTIALS;
+
+      document.getElementById('page').innerHTML =
+        '<div class="w-full max-w-md">' +
+        '<a href="index.html" class="flex items-center justify-center gap-2.5"><span class="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-500 text-white shadow-theme-md">' + icon('ticket', { size: 20 }) + '</span><span class="text-xl font-bold text-heading">' + t('brand') + '</span></a>' +
+        '<div class="surface-card mt-8 rounded-2xl border p-7">' +
+        '<h1 class="text-2xl font-bold text-heading">' + t('auth.loginTitle') + '</h1>' +
+        '<p class="mt-1 text-sm text-muted">' + t('auth.loginSubtitle') + '</p>' +
+        '<div class="mt-5 rounded-xl border border-brand-200 bg-brand-50 p-4 dark:border-brand-500/30 dark:bg-brand-500/10"><p class="text-xs font-semibold text-brand-700 dark:text-brand-400">' + t('auth.demoTitle') + '</p><p class="mt-1 text-xs text-muted">' + t('auth.demoHint') + '</p><p class="mt-1.5 font-mono text-xs text-body">' + demo.email + ' · ' + demo.password + '</p></div>' +
+        '<form data-page-form="login" class="mt-6 space-y-4">' +
+        '<label class="block"><span class="text-sm font-medium text-body">' + t('auth.email') + '</span><input required type="email" name="email" value="' + demo.email + '" class="mt-1.5 h-11 w-full rounded-lg border border-themed bg-transparent px-3 text-sm text-body outline-none focus:border-brand-300 focus-ring"/></label>' +
+        '<label class="block"><span class="text-sm font-medium text-body">' + t('auth.password') + '</span><input required type="password" name="password" value="' + demo.password + '" class="mt-1.5 h-11 w-full rounded-lg border border-themed bg-transparent px-3 text-sm text-body outline-none focus:border-brand-300 focus-ring"/></label>' +
+        '<div class="flex items-center justify-between text-sm"><label class="flex items-center gap-2 text-muted"><input type="checkbox" class="rounded border-themed"/> ' + t('auth.remember') + '</label><a href="#" class="font-medium text-brand-600 hover:text-brand-700">' + t('auth.forgot') + '</a></div>' +
+        '<button type="submit" class="flex h-12 w-full items-center justify-center rounded-xl bg-brand-500 text-sm font-semibold text-white transition hover:bg-brand-600">' + t('auth.loginCta') + '</button>' +
+        '</form>' +
+        '<p class="mt-6 text-center text-sm text-muted">' + t('auth.noAccount') + ' <a href="registro.html" class="font-medium text-brand-600 hover:text-brand-700">' + t('auth.registerCta') + '</a></p>' +
+        '</div></div>';
+    };
+  </script>
+  <script src="assets/js/layout.js"></script>
+</body>
+</html>

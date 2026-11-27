@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <title>Eventos — Ingressos & Bilheteria</title>
+  <link rel="stylesheet" href="assets/css/tailwind.css" />
+  <script src="assets/js/state.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/format.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/ev.js"></script>
+  <script src="assets/js/query.js"></script>
+  <script src="assets/js/icons.js"></script>
+  <script src="assets/js/i18n.js"></script>
+</head>
+<body data-shell="public">
+  <div id="app"><div id="page"></div></div>
+
+  <script>
+    let subscribed = false;
+
+    window.renderPage = function () {
+      const t = UI.t;
+      const items = Cart.items();
+
+      if (!subscribed) {
+        Cart.subscribe(function () { window.renderPage(); });
+        subscribed = true;
+      }
+
+      let body;
+      if (items.length === 0) {
+        body = UI.emptyState({
+          icon: 'shopping-cart',
+          title: t('cart.empty'),
+          description: t('cart.emptyDesc'),
+          action: '<a href="eventos.html" class="inline-flex rounded-lg bg-brand-500 px-6 py-3 text-sm font-medium text-white hover:bg-brand-600">' + t('cart.explore') + '</a>',
+        });
+      } else {
+        const rows = items.map((i) => UI.cartItem(i)).join('');
+        const summary =
+          '<aside><div class="surface-card sticky top-24 rounded-2xl border p-5"><h2 class="text-lg font-semibold text-heading">' + t('cart.summary') + '</h2>' +
+          '<dl class="mt-4 space-y-3 text-sm"><div class="flex justify-between"><dt class="text-muted">' + t('cart.subtotal') + '</dt><dd class="font-medium text-heading">' + UI.fmt(Cart.subtotal()) + '</dd></div>' +
+          '<div class="flex justify-between"><dt class="text-muted">' + t('cart.fee') + '</dt><dd class="font-medium text-heading">' + UI.fmt(Cart.fee()) + '</dd></div>' +
+          '<div class="flex justify-between border-t border-themed pt-3"><dt class="font-semibold text-heading">' + t('cart.total') + '</dt><dd class="text-lg font-bold text-heading">' + UI.fmt(Cart.total()) + '</dd></div></dl>' +
+          '<a href="checkout.html" class="mt-5 flex h-12 w-full items-center justify-center rounded-xl bg-brand-500 text-sm font-semibold text-white transition hover:bg-brand-600">' + t('cart.checkout') + '</a>' +
+          '<a href="eventos.html" class="mt-3 flex h-11 w-full items-center justify-center rounded-xl border border-themed text-sm font-medium text-body transition hover:bg-gray-50 dark:hover:bg-gray-800">' + t('cart.continue') + '</a>' +
+          '</div></aside>';
+        body =
+          '<div class="grid gap-8 lg:grid-cols-[1fr_360px]"><div class="space-y-4">' + rows + '</div>' + summary + '</div>';
+      }
+
+      document.getElementById('page').innerHTML =
+        '<div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">' +
+        '<h1 class="text-3xl font-bold text-heading">' + t('cart.title') + '</h1>' +
+        '<p class="mt-1 text-muted">' + t('cart.subtitle') + '</p>' +
+        '<div class="mt-6">' + body + '</div>' +
+        '</div>';
+    };
+  </script>
+  <script src="assets/js/layout.js"></script>
+</body>
+</html>

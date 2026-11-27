@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <title>Eventos — Ingressos & Bilheteria</title>
+  <link rel="stylesheet" href="assets/css/tailwind.css" />
+  <script src="assets/js/state.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/format.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/ev.js"></script>
+  <script src="assets/js/query.js"></script>
+  <script src="assets/js/icons.js"></script>
+  <script src="assets/js/i18n.js"></script>
+</head>
+<body data-shell="public">
+  <div id="app"><div id="page"></div></div>
+
+  <script>
+    let payment = 'card';
+    let confirmedCode = null;
+
+    window.setPayment = function (p) {
+      payment = p;
+      window.renderPage();
+    };
+
+    window.onFormSubmit = function (name, form) {
+      if (name !== 'checkout') return;
+      const t = UI.t;
+      const data = Object.fromEntries(new FormData(form).entries());
+      if (!data.name || !data.email || !/.+@.+\..+/.test(data.email)) {
+        UI.notify(t('checkout.validation.required'), 'error');
+        return;
+      }
+      const result = EventsStore.checkout({
+        buyerName: data.name,
+        buyerEmail: data.email,
+        payment: payment,
+        items: Cart.items(),
+      });
+      Cart.clear();
+      confirmedCode = result.order.code;
+      UI.notify(t('checkout.success'), 'success');
+      window.renderPage();
+      window.scrollTo({ top: 0 });
+    };
+
+    window.renderPage = function () {
+      const t = UI.t, icon = UI.icon;
+      const user = Auth.getUser();
+
+      if (confirmedCode) {
+        document.getElementById('page').innerHTML =
+          '<div class="mx-auto max-w-lg px-4 py-20 text-center sm:px-6">' +
+          '<span class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-success-50 text-success-600 dark:bg-success-500/15">' + icon('check-circle', { size: 32 }) + '</span>' +
+          '<h1 class="mt-6 text-2xl font-bold text-heading">' + t('checkout.done.title') + '</h1>' +
+          '<p class="mt-2 text-sm text-muted">' + t('checkout.done.subtitle') + '</p>' +
+          '<div class="surface-card mt-6 inline-flex flex-col items-center rounded-xl border px-6 py-4"><span class="text-xs text-muted">' + t('checkout.done.code') + '</span><span class="font-mono text-lg font-bold text-heading">' + confirmedCode + '</span></div>' +
+          '<div class="mt-8"><a href="meus-ingressos.html" class="inline-flex h-12 items-center gap-2 rounded-xl bg-brand-500 px-7 text-sm font-semibold text-white transition hover:bg-brand-600">' + icon('ticket', { size: 18 }) + t('checkout.done.viewTickets') + '</a></div>' +
+          '</div>';
+        return;
+      }
+
+      if (Cart.items().length === 0) {
+        document.getElementById('page').innerHTML =
+          '<div class="mx-auto max-w-3xl px-4 py-20 sm:px-6">' +
+          UI.emptyState({
+            icon: 'shopping-cart',
+            title: t('cart.empty'),
+            description: t('cart.emptyDesc'),
+            action: '<a href="eventos.html" class="inline-flex rounded-lg bg-brand-500 px-6 py-3 text-sm font-medium text-white hover:bg-brand-600">' + t('cart.explore') + '</a>',
+          }) +
+          '</div>';
+        return;
+      }
+
+      const field = (name, label, type, value, opt) =>
+        '<label class="block"><span class="text-sm font-medium text-body">' + label + (opt ? ' <span class="text-muted">(' + t('common.optional') + ')</span>' : '') + '</span><input ' + (opt ? '' : 'required ') + 'type="' + (type || 'text') + '" name="' + name + '" value="' + (value || '') + '" class="mt-1.5 h-11 w-full rounded-lg border border-themed bg-transparent px-3 text-sm text-body outline-none focus:border-brand-300 focus-ring"/></label>';
+
+      const PAYMENTS = [
+        { id: 'card', label: t('checkout.card'), icon: 'credit-card' },
+        { id: 'pix', label: t('checkout.pix'), icon: 'zap' },
+        { id: 'boleto', label: t('checkout.boleto'), icon: 'file-text' },
+      ];
+      const payTabs = PAYMENTS.map((p) =>
+        '<button type="button" onclick="setPayment(\'' + p.id + '\')" class="flex flex-1 items-center justify-center gap-2 rounded-lg border px-3 py-3 text-sm font-medium transition ' + (payment === p.id ? 'border-brand-500 bg-brand-50 text-brand-600 dark:bg-brand-500/15' : 'border-themed text-body hover:border-brand-300') + '">' + icon(p.icon, { size: 18 }) + p.label + '</button>'
+      ).join('');
+
+      let payBody = '';
+      if (payment === 'card') {
+        payBody =
+          '<div class="mt-4 grid gap-4 sm:grid-cols-2">' +
+          '<div class="sm:col-span-2">' + field('cardNumber', t('checkout.cardNumber'), 'text', '', true) + '</div>' +
+          '<div class="sm:col-span-2">' + field('cardName', t('checkout.cardName'), 'text', '', true) + '</div>' +
+          field('cardExpiry', t('checkout.cardExpiry'), 'text', '', true) +
+          field('cardCvv', t('checkout.cardCvv'), 'text', '', true) +
+          '</div>';
+      } else if (payment === 'pix') {
+        payBody = '<p class="mt-4 rounded-lg bg-brand-50 p-4 text-sm text-body dark:bg-brand-500/10">' + t('checkout.pixInfo') + '</p>';
+      } else {
+        payBody = '<p class="mt-4 rounded-lg bg-warning-50 p-4 text-sm text-body dark:bg-warning-500/10">' + t('checkout.boletoInfo') + '</p>';
+      }
+
+      const formCol =
+        '<form data-page-form="checkout" class="space-y-6">' +
+        '<div class="surface-card rounded-2xl border p-5"><h2 class="text-lg font-semibold text-heading">' + t('checkout.buyer') + '</h2>' +
+        '<div class="mt-4 grid gap-4 sm:grid-cols-2">' +
+        field('name', t('checkout.name'), 'text', user && user.name) +
+        field('email', t('checkout.email'), 'email', user && user.email) +
+        field('phone', t('checkout.phone'), 'text', '', true) +
+        field('cpf', t('checkout.cpf'), 'text', '', true) +
+        '</div></div>' +
+        '<div class="surface-card rounded-2xl border p-5"><h2 class="text-lg font-semibold text-heading">' + t('checkout.payment') + '</h2><div class="mt-4 flex gap-3">' + payTabs + '</div>' + payBody + '</div>' +
+        '<button type="submit" class="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-brand-500 text-sm font-semibold text-white transition hover:bg-brand-600">' + icon('check-circle', { size: 18 }) + t('checkout.placeOrder') + '</button>' +
+        '</form>';
+
+      const lines = Cart.items().map((i) =>
+        '<div class="flex justify-between gap-2 text-sm"><span class="text-body">' + i.qty + '× ' + i.eventTitle + ' <span class="text-muted">(' + i.tierName + ')</span></span><span class="font-medium text-heading">' + UI.fmt(i.price * i.qty) + '</span></div>'
+      ).join('');
+      const summary =
+        '<aside><div class="surface-card sticky top-24 rounded-2xl border p-5"><h2 class="text-lg font-semibold text-heading">' + t('checkout.summary') + '</h2>' +
+        '<div class="mt-4 space-y-2">' + lines + '</div>' +
+        '<dl class="mt-4 space-y-3 border-t border-themed pt-4 text-sm"><div class="flex justify-between"><dt class="text-muted">' + t('cart.subtotal') + '</dt><dd class="font-medium text-heading">' + UI.fmt(Cart.subtotal()) + '</dd></div>' +
+        '<div class="flex justify-between"><dt class="text-muted">' + t('cart.fee') + '</dt><dd class="font-medium text-heading">' + UI.fmt(Cart.fee()) + '</dd></div>' +
+        '<div class="flex justify-between border-t border-themed pt-3"><dt class="font-semibold text-heading">' + t('cart.total') + '</dt><dd class="text-lg font-bold text-heading">' + UI.fmt(Cart.total()) + '</dd></div></dl>' +
+        '</div></aside>';
+
+      document.getElementById('page').innerHTML =
+        '<div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">' +
+        UI.breadcrumb([{ label: t('cart.title'), href: 'carrinho.html' }, { label: t('checkout.title') }]) +
+        '<h1 class="mt-4 text-3xl font-bold text-heading">' + t('checkout.title') + '</h1>' +
+        '<div class="mt-6 grid gap-8 lg:grid-cols-[1fr_360px]">' + formCol + summary + '</div>' +
+        '</div>';
+    };
+  </script>
+  <script src="assets/js/layout.js"></script>
+</body>
+</html>

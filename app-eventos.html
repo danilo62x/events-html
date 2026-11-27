@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <title>Eventos — Ingressos & Bilheteria</title>
+  <link rel="stylesheet" href="assets/css/tailwind.css" />
+  <script src="assets/js/state.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/format.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/ev.js"></script>
+  <script src="assets/js/query.js"></script>
+  <script src="assets/js/icons.js"></script>
+  <script src="assets/js/i18n.js"></script>
+</head>
+<body data-shell="app" data-guard="true">
+  <div id="app"><div id="page"></div></div>
+
+  <script>
+    let editingId = null;
+
+    window.openEventModal = function (id) {
+      editingId = id || null;
+      const t = UI.t;
+      const st = EventsStore.get();
+      const e = id ? Query.eventById(st.events, id) : null;
+      const f = (n, label, val, type) =>
+        '<label class="block"><span class="text-sm font-medium text-body">' + label + '</span><input type="' + (type || 'text') + '" name="' + n + '" value="' + (val == null ? '' : String(val).replace(/"/g, '&quot;')) + '" class="mt-1.5 h-11 w-full rounded-lg border border-themed bg-transparent px-3 text-sm text-body outline-none focus:border-brand-300 focus-ring"/></label>';
+      const catOpts = Data.CATEGORIES.map((c) => '<option value="' + c + '" ' + (e && e.category === c ? 'selected' : '') + '>' + t('categories.' + c) + '</option>').join('');
+      const body =
+        '<form data-page-form="event" class="grid gap-4 sm:grid-cols-2">' +
+        '<div class="sm:col-span-2">' + f('title', t('manage.form.title'), e && e.title) + '</div>' +
+        '<label class="block"><span class="text-sm font-medium text-body">' + t('manage.form.category') + '</span><select name="category" class="mt-1.5 h-11 w-full rounded-lg border border-themed bg-transparent px-3 text-sm text-body outline-none focus:border-brand-300 focus-ring">' + catOpts + '</select></label>' +
+        f('venue', t('manage.form.venue'), e && e.venue) +
+        f('city', t('manage.form.city'), e && e.city) +
+        f('organizer', t('manage.form.organizer'), e && e.organizer) +
+        '<div class="sm:col-span-2">' + f('address', t('manage.form.address'), e && e.address) + '</div>' +
+        '<div class="sm:col-span-2"><label class="block"><span class="text-sm font-medium text-body">' + t('manage.form.description') + '</span><textarea name="description" rows="3" class="mt-1.5 w-full rounded-lg border border-themed bg-transparent px-3 py-2 text-sm text-body outline-none focus:border-brand-300 focus-ring">' + ((e && e.description) || '') + '</textarea></label></div>' +
+        '</form>';
+      const footer =
+        '<button type="button" data-modal-close class="h-10 rounded-lg border border-themed px-4 text-sm font-medium text-body hover:bg-gray-50 dark:hover:bg-gray-800">' + t('common.cancel') + '</button>' +
+        '<button type="button" onclick="saveEvent()" class="h-10 rounded-lg bg-brand-500 px-4 text-sm font-medium text-white hover:bg-brand-600">' + t('common.save') + '</button>';
+      document.getElementById('modal-mount').innerHTML = UI.modal('event-modal', { title: e ? t('manage.editTitle') : t('manage.createTitle'), body: body, footer: footer, size: 'lg' });
+      UI.openModal('event-modal');
+    };
+
+    window.saveEvent = function () {
+      const t = UI.t;
+      const form = document.querySelector('#event-modal [data-page-form="event"]');
+      const data = Object.fromEntries(new FormData(form).entries());
+      if (!data.title) { UI.notify(t('manage.validation') || t('checkout.validation.required'), 'error'); return; }
+      if (editingId) { EventsStore.updateEvent(editingId, data); UI.notify(t('manage.updated'), 'success'); }
+      else { EventsStore.createEvent(data); UI.notify(t('manage.created'), 'success'); }
+      UI.closeModal('event-modal');
+      window.renderPage();
+    };
+
+    window.togglePublish = function (id) {
+      const st = EventsStore.get();
+      const e = Query.eventById(st.events, id);
+      if (!e) return;
+      if (e.status === 'published') { EventsStore.endEvent(id); UI.notify(UI.t('manage.ended'), 'info'); }
+      else { EventsStore.publishEvent(id); UI.notify(UI.t('manage.published'), 'success'); }
+      window.renderPage();
+    };
+
+    window.renderPage = function () {
+      const t = UI.t, icon = UI.icon;
+      const st = EventsStore.get();
+
+      UI.dataTable({
+        id: 'events-table',
+        pageSize: 8,
+        searchKeys: ['title', 'city', 'venue'],
+        rows: st.events,
+        columns: [
+          { key: 'title', header: t('manage.columns.event'), render: (e) => '<div class="flex items-center gap-3"><img src="' + e.cover + '" alt="" class="h-10 w-14 shrink-0 rounded-lg object-cover"/><a href="app-evento.html?id=' + e.id + '" class="font-medium text-heading hover:text-brand-600">' + e.title + '</a></div>' },
+          { key: 'date', header: t('manage.columns.date'), render: (e) => UI.fmtDate(e.date) },
+          { key: 'city', header: t('manage.columns.city') },
+          { key: 'status', header: t('manage.columns.status'), render: (e) => UI.statusPill('event', e.status) },
+          { key: 'id', header: t('manage.columns.sold'), sortable: false, render: (e) => { const tiers = Query.tiersForEvent(st.tiers, e.id); return String(tiers.reduce((s, x) => s + x.sold, 0)); } },
+          { header: t('manage.columns.actions'), sortable: false, render: (e) =>
+            '<div class="flex items-center gap-1.5">' +
+            '<a href="app-evento.html?id=' + e.id + '" class="flex h-8 items-center gap-1 rounded-lg border border-themed px-2.5 text-xs text-body hover:border-brand-300">' + icon('dollar', { size: 14 }) + t('manage.manageSales') + '</a>' +
+            '<button type="button" onclick="openEventModal(' + e.id + ')" class="flex h-8 w-8 items-center justify-center rounded-lg border border-themed text-muted hover:text-heading">' + icon('edit', { size: 14 }) + '</button>' +
+            '<button type="button" onclick="togglePublish(' + e.id + ')" class="flex h-8 items-center rounded-lg border border-themed px-2.5 text-xs text-body hover:border-brand-300">' + (e.status === 'published' ? t('manage.unpublish') : t('manage.publish')) + '</button>' +
+            '</div>' },
+        ],
+      });
+
+      document.getElementById('page').innerHTML =
+        UI.pageHeader({ title: t('manage.title'), subtitle: t('manage.subtitle'), action: '<button type="button" onclick="openEventModal()" class="flex h-10 items-center gap-2 rounded-lg bg-brand-500 px-4 text-sm font-medium text-white transition hover:bg-brand-600">' + icon('plus', { size: 16 }) + t('manage.newEvent') + '</button>' }) +
+        '<div id="events-table" data-table></div>' +
+        '<div id="modal-mount"></div>';
+
+      UI.renderTable('events-table');
+    };
+  </script>
+  <script src="assets/js/layout.js"></script>
+</body>
+</html>

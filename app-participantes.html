@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <title>Eventos — Ingressos & Bilheteria</title>
+  <link rel="stylesheet" href="assets/css/tailwind.css" />
+  <script src="assets/js/state.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/format.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/ev.js"></script>
+  <script src="assets/js/query.js"></script>
+  <script src="assets/js/icons.js"></script>
+  <script src="assets/js/i18n.js"></script>
+</head>
+<body data-shell="app" data-guard="true">
+  <div id="app"><div id="page"></div></div>
+
+  <script>
+    let eventFilter = '';
+
+    window.onFilterChange = function (name, value) {
+      if (name === 'event') { eventFilter = value; window.renderPage(); }
+    };
+
+    window.copyCode = function (code) {
+      if (navigator.clipboard) navigator.clipboard.writeText(code).catch(function () {});
+      UI.notify(UI.t('attendees.copyCode'), 'success');
+    };
+
+    window.renderPage = function () {
+      const t = UI.t, icon = UI.icon;
+      const st = EventsStore.get();
+      let rows = st.attendees;
+      if (eventFilter) rows = rows.filter((a) => String(a.eventId) === eventFilter);
+
+      const eventOptions = [{ value: '', label: t('attendees.allEvents') }].concat(
+        st.events.map((e) => ({ value: String(e.id), label: e.title }))
+      );
+
+      UI.dataTable({
+        id: 'attendees-table',
+        pageSize: 10,
+        searchKeys: ['name', 'email', 'ticketCode'],
+        rows: rows,
+        columns: [
+          { key: 'name', header: t('attendees.columns.attendee'), render: (a) => UI.attendeeRow(a) },
+          { key: 'tierName', header: t('attendees.columns.tier') },
+          { key: 'ticketCode', header: t('attendees.columns.code'), render: (a) => '<button type="button" onclick="copyCode(\'' + a.ticketCode + '\')" class="inline-flex items-center gap-1.5 font-mono text-xs text-body hover:text-brand-600">' + a.ticketCode + icon('copy', { size: 13 }) + '</button>' },
+          { key: 'purchasedAt', header: t('attendees.columns.purchased'), render: (a) => UI.fmtDate(a.purchasedAt) },
+          { key: 'checkedIn', header: t('attendees.columns.status'), render: (a) => UI.statusPill('checkin', a.checkedIn) },
+        ],
+      });
+
+      document.getElementById('page').innerHTML =
+        UI.pageHeader({ title: t('attendees.title'), subtitle: t('attendees.subtitle') }) +
+        '<div class="mb-4">' + UI.filterBar(UI.selectInput('event', eventOptions, eventFilter)) + '</div>' +
+        '<div id="attendees-table" data-table></div>';
+
+      UI.renderTable('attendees-table');
+    };
+  </script>
+  <script src="assets/js/layout.js"></script>
+</body>
+</html>
